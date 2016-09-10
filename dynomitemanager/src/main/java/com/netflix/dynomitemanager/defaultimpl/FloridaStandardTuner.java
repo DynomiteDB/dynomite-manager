@@ -39,7 +39,6 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.netflix.dynomitemanager.defaultimpl.DynomitemanagerConfiguration.DYNO_REDIS_CONF_PATH;
 import static java.nio.file.StandardCopyOption.COPY_ATTRIBUTES;
 import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
 import static java.nio.file.StandardOpenOption.WRITE;
@@ -184,9 +183,10 @@ public class FloridaStandardTuner implements ProcessTuner {
 		long storeMaxMem = getStoreMaxMem();
 
 		// Updating the file.
-		logger.info("Updating Redis conf: " + DYNO_REDIS_CONF_PATH);
-		Path confPath = Paths.get(DYNO_REDIS_CONF_PATH);
-		Path backupPath = Paths.get(DYNO_REDIS_CONF_PATH + ".bkp");
+		String redisConf = config.getRedisConf();
+		logger.info("Updating Redis conf: " + redisConf);
+		Path confPath = Paths.get(redisConf);
+		Path backupPath = Paths.get(redisConf + ".bkp");
 
 		// backup the original baked in conf only and not subsequent updates
 		if (!Files.exists(backupPath)) {

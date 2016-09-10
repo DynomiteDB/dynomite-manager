@@ -229,4 +229,8 @@ public interface IConfiguration {
 
 	public boolean isEurekaHostSupplierEnabled();
 
+	// Redis
+	// =====
+
+	public String getRedisConf();
 }

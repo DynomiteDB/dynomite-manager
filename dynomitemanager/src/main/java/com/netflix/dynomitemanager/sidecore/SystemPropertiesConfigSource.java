@@ -40,7 +40,7 @@ public final class SystemPropertiesConfigSource extends AbstractConfigSource {
 		Properties systemProps = System.getProperties();
 
 		for (final String key : systemProps.stringPropertyNames()) {
-			if (!key.startsWith(DynomitemanagerConfiguration.DYNOMITEMANAGER_PRE))
+			if (!key.startsWith(DynomitemanagerConfiguration.DM_PREFIX))
 				continue;
 			final String value = systemProps.getProperty(key);
 			if (value != null && !BLANK.equals(value)) {
