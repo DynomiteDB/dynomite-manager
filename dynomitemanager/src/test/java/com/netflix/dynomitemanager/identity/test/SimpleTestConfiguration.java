@@ -355,4 +355,8 @@ public class SimpleTestConfiguration implements IConfiguration {
 		return false;
 	}
 
+	@Override
+	public String getRedisConf() {
+		return null;
+	}
 }

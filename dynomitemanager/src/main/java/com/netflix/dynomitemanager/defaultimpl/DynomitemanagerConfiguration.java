@@ -39,117 +39,151 @@ import com.netflix.dynomitemanager.identity.InstanceEnvIdentity;
 
 /**
  * Define the list of available Dynomite Manager configuration options, then set options based on the environment and
- * an external configuration.
+ * an external configuration. Dynomite Manager properties may be provided via the following mechanisms:
+ * <ul>
+ * <li>Archaius: Excellent option for enterprise deployments as it provides dynamic properties
+ * <li>Environment variables: Localized configuration passed in via environment variables
+ * <li>Java properties: Localized configuration passed in via the command line in an init scrip
+ * </ul>
  */
 @Singleton
 public class DynomitemanagerConfiguration implements IConfiguration {
-	public static final String DYNOMITEMANAGER_PRE = "florida";
+	public static final String DM_PREFIX = "dm";
 
 	public static final int DYNO_MEMCACHED = 0;
 	public static final int DYNO_REDIS = 1;
-	public static final String DYNO_REDIS_CONF_PATH = "/apps/nfredis/conf/redis.conf";
 	public static final int DYNO_PORT = 8102;
-	public static final int REDIS_PORT = 22122;
 	public final static String LOCAL_ADDRESS = "127.0.0.1";
 
-	private static final String CONFIG_DYN_HOME_DIR = DYNOMITEMANAGER_PRE + ".dyno.home";
-	private static final String CONFIG_DYN_START_SCRIPT = DYNOMITEMANAGER_PRE + ".dyno.startscript";
-	private static final String CONFIG_DYN_STOP_SCRIPT = DYNOMITEMANAGER_PRE + ".dyno.stopscript";
+	// Redis
+	// =====
 
-	private static final String CONFIG_CLUSTER_NAME = DYNOMITEMANAGER_PRE + ".dyno.clustername";
-	private static final String CONFIG_SEED_PROVIDER_NAME = DYNOMITEMANAGER_PRE + ".dyno.seed.provider";
-	private static final String CONFIG_DYN_LISTENER_PORT_NAME = DYNOMITEMANAGER_PRE + ".dyno.port";
-	private static final String CONFIG_DYN_PEER_PORT_NAME = DYNOMITEMANAGER_PRE + ".dyno.peer.port";
-	private static final String CONFIG_DYN_SECURED_PEER_PORT_NAME = DYNOMITEMANAGER_PRE + ".dyno.secured.peer.port";
-	private static final String CONFIG_RACK_NAME = DYNOMITEMANAGER_PRE + ".dyno.rack";
-	private static final String CONFIG_USE_ASG_FOR_RACK_NAME = DYNOMITEMANAGER_PRE + ".dyno.asg.rack";
-	private static final String CONFIG_TOKENS_DISTRIBUTION_NAME = DYNOMITEMANAGER_PRE + ".dyno.tokens.distribution";
-	private static final String CONFIG_DYNO_REQ_TIMEOUT_NAME =
-			DYNOMITEMANAGER_PRE + ".dyno.request.timeout";   //in milliseconds
-	private static final String CONFIG_DYNO_GOSSIP_INTERVAL_NAME =
-			DYNOMITEMANAGER_PRE + ".dyno.gossip.interval"; //in milliseconds
-	private static final String CONFIG_DYNO_TOKENS_HASH_NAME = DYNOMITEMANAGER_PRE + ".dyno.tokens.hash";
-	private static final String CONFIG_DYNO_CONNECTIONS_PRECONNECT =
-			DYNOMITEMANAGER_PRE + ".dyno.connections.preconnect";
-	private static final String CONFIG_DYNO_CLUSTER_TYPE = DYNOMITEMANAGER_PRE + ".dyno.cluster.type";
-	private static final String CONFIG_DYNO_IS_MULTI_REGIONED_CLUSTER = DYNOMITEMANAGER_PRE + ".dyno.multiregion";
-	private static final String CONFIG_DYNO_HEALTHCHECK_ENABLE = DYNOMITEMANAGER_PRE + ".dyno.healthcheck.enable";
+	// Full path to redis.conf.
+	// Netflix:    /apps/nfredis/conf/redis.conf
+	// DynomiteDB: /etc/dynomitedb/redis.conf
+	public static final String DYNO_REDIS_CONF_PATH = "/apps/nfredis/conf/redis.conf";
+	private static final String CONFIG_REDIS_CONF = DM_PREFIX + ".redis.conf";
+
+	public static final int REDIS_PORT = 22122;
+
+	// Full path to Redis init scripts to start/stop redis-server.
+	// Netflix:    /apps/nfredis/bin/launch_nfredis.sh
+	//             /apps/nfredis/bin/kill_redis.sh
+	// DynomiteDB: /etc/init.d/dynomitedb-redis start
+	//             /etc/init.d/dynomitedb-redis stop
+	private final String DEFAULT_REDIS_START_SCRIPT = "/apps/nfredis/bin/launch_nfredis.sh";
+	private static final String CONFIG_REDIS_START_SCRIPT = DM_PREFIX + ".redis.startscript";
+	private final String DEFAULT_REDIS_STOP_SCRIPT = "/apps/nfredis/bin/kill_redis.sh";
+	private static final String CONFIG_REDIS_STOP_STOP = DM_PREFIX + ".redis.stopscript";
+
+	// Persistence
+	private static final boolean DEFAULT_PERSISTENCE_ENABLED = false;
+	private static final String DEFAULT_PERSISTENCE_TYPE = "aof";
+	private static final String DEFAULT_PERSISTENCE_DIR = "/mnt/data/nfredis";
+
+	// Dynomite
+	// ========
+
+	// Full path to the root of Dynomite's installation directory.
+	// Netflix:    /apps/dynomite
+	// DynomiteDB: /etc/dynomitedb
+	private final String DEFAULT_DYN_HOME_DIR = "/apps/dynomite";
+	private static final String CONFIG_DYN_HOME_DIR = DM_PREFIX + ".dyno.home";
+
+	// Init script to start/stop the dynomite process.
+	// Netflix:    /apps/dynomite/bin/launch_dynomite.sh
+	//             /apps/dynomite/bin/kill_dynomite.sh
+	// DynomiteDB: /etc/init.d/dynomitedb-dynomite start
+	//             /etc/init.d/dynomitedb-dynomite stop
+	private final String DEFAULT_DYN_START_SCRIPT = "/apps/dynomite/bin/launch_dynomite.sh";
+	private static final String CONFIG_DYN_START_SCRIPT = DM_PREFIX + ".dyno.startscript";
+	private final String DEFAULT_DYN_STOP_SCRIPT = "/apps/dynomite/bin/kill_dynomite.sh";
+	private static final String CONFIG_DYN_STOP_SCRIPT = DM_PREFIX + ".dyno.stopscript";
+
+	private static final String CONFIG_CLUSTER_NAME = DM_PREFIX + ".dyno.clustername";
+	private static final String CONFIG_SEED_PROVIDER_NAME = DM_PREFIX + ".dyno.seed.provider";
+	private static final String CONFIG_DYN_LISTENER_PORT_NAME = DM_PREFIX + ".dyno.port";
+	private static final String CONFIG_DYN_PEER_PORT_NAME = DM_PREFIX + ".dyno.peer.port";
+	private static final String CONFIG_DYN_SECURED_PEER_PORT_NAME = DM_PREFIX + ".dyno.secured.peer.port";
+	private static final String CONFIG_RACK_NAME = DM_PREFIX + ".dyno.rack";
+	private static final String CONFIG_USE_ASG_FOR_RACK_NAME = DM_PREFIX + ".dyno.asg.rack";
+	private static final String CONFIG_TOKENS_DISTRIBUTION_NAME = DM_PREFIX + ".dyno.tokens.distribution";
+	private static final String CONFIG_DYNO_REQ_TIMEOUT_NAME = DM_PREFIX + ".dyno.request.timeout"; // in ms
+	private static final String CONFIG_DYNO_GOSSIP_INTERVAL_NAME = DM_PREFIX + ".dyno.gossip.interval"; // in ms
+	private static final String CONFIG_DYNO_TOKENS_HASH_NAME = DM_PREFIX + ".dyno.tokens.hash";
+	private static final String CONFIG_DYNO_CONNECTIONS_PRECONNECT = DM_PREFIX + ".dyno.connections.preconnect";
+	private static final String CONFIG_DYNO_CLUSTER_TYPE = DM_PREFIX + ".dyno.cluster.type";
+	private static final String CONFIG_DYNO_IS_MULTI_REGIONED_CLUSTER = DM_PREFIX + ".dyno.multiregion";
+	private static final String CONFIG_DYNO_HEALTHCHECK_ENABLE = DM_PREFIX + ".dyno.healthcheck.enable";
 	// The max percentage of system memory to be allocated to the Dynomite fronted data store.
-	private static final String CONFIG_DYNO_STORAGE_MEM_PCT_INT = DYNOMITEMANAGER_PRE + ".dyno.storage.mem.pct.int";
+	private static final String CONFIG_DYNO_STORAGE_MEM_PCT_INT = DM_PREFIX + ".dyno.storage.mem.pct.int";
 
-	private static final String CONFIG_DYNO_MBUF_SIZE = DYNOMITEMANAGER_PRE + ".dyno.mbuf.size";
-	private static final String CONFIG_DYNO_MAX_ALLOC_MSGS = DYNOMITEMANAGER_PRE + ".dyno.allocated.messages";
+	private static final String CONFIG_DYNO_MBUF_SIZE = DM_PREFIX + ".dyno.mbuf.size";
+	private static final String CONFIG_DYNO_MAX_ALLOC_MSGS = DM_PREFIX + ".dyno.allocated.messages";
 
-	private static final String CONFIG_AVAILABILITY_ZONES = DYNOMITEMANAGER_PRE + ".zones.available";
-	private static final String CONFIG_AVAILABILITY_RACKS = DYNOMITEMANAGER_PRE + ".racks.available";
+	private static final String CONFIG_AVAILABILITY_ZONES = DM_PREFIX + ".zones.available";
+	private static final String CONFIG_AVAILABILITY_RACKS = DM_PREFIX + ".racks.available";
 
-	private static final String CONFIG_DYN_PROCESS_NAME = DYNOMITEMANAGER_PRE + ".dyno.processname";
-	private static final String CONFIG_YAML_LOCATION = DYNOMITEMANAGER_PRE + ".yamlLocation";
-	private static final String CONFIG_METADATA_KEYSPACE = DYNOMITEMANAGER_PRE + ".metadata.keyspace";
-	private static final String CONFIG_SECURED_OPTION = DYNOMITEMANAGER_PRE + ".secured.option";
-	private static final String CONFIG_DYNO_AUTO_EJECT_HOSTS = DYNOMITEMANAGER_PRE + ".auto.eject.hosts";
+	private static final String CONFIG_DYN_PROCESS_NAME = DM_PREFIX + ".dyno.processname";
+	private static final String CONFIG_YAML_LOCATION = DM_PREFIX + ".yamlLocation";
+	private static final String CONFIG_METADATA_KEYSPACE = DM_PREFIX + ".metadata.keyspace";
+	private static final String CONFIG_SECURED_OPTION = DM_PREFIX + ".secured.option";
+	private static final String CONFIG_DYNO_AUTO_EJECT_HOSTS = DM_PREFIX + ".auto.eject.hosts";
 
 	// Cassandra Cluster for token management
-	private static final String CONFIG_BOOTCLUSTER_NAME = DYNOMITEMANAGER_PRE + ".bootcluster";
-	private static final String CONFIG_CASSANDRA_KEYSPACE_NAME = DYNOMITEMANAGER_PRE + ".cassandra.keyspace.name";
-	private static final String CONFIG_CASSANDRA_THRIFT_PORT = DYNOMITEMANAGER_PRE + ".cassandra.thrift.port";
+	private static final String CONFIG_BOOTCLUSTER_NAME = DM_PREFIX + ".bootcluster";
+	private static final String CONFIG_CASSANDRA_KEYSPACE_NAME = DM_PREFIX + ".cassandra.keyspace.name";
+	private static final String CONFIG_CASSANDRA_THRIFT_PORT = DM_PREFIX + ".cassandra.thrift.port";
 	private static final String CONFIG_COMMA_SEPARATED_CASSANDRA_HOSTNAMES =
-			DYNOMITEMANAGER_PRE + ".cassandra.comma.separated.hostnames";
+			DM_PREFIX + ".cassandra.comma.separated.hostnames";
 
 	// Eureka
+	// ======
 	private static final String CONFIG_IS_EUREKA_HOST_SUPPLIER_ENABLED =
-			DYNOMITEMANAGER_PRE + ".eureka.host.supplier.enabled";
+			DM_PREFIX + ".eureka.host.supplier.enabled";
 
 	// Amazon specific
-	private static final String CONFIG_ASG_NAME = DYNOMITEMANAGER_PRE + ".az.asgname";
-	private static final String CONFIG_REGION_NAME = DYNOMITEMANAGER_PRE + ".az.region";
-	private static final String CONFIG_ACL_GROUP_NAME = DYNOMITEMANAGER_PRE + ".acl.groupname";
-	private static final String CONFIG_VPC = DYNOMITEMANAGER_PRE + ".vpc";
-	private static final String CONFIG_EC2_ROLE_ASSUMPTION_ARN = DYNOMITEMANAGER_PRE + ".ec2.roleassumption.arn";
-	private static final String CONFIG_VPC_ROLE_ASSUMPTION_ARN = DYNOMITEMANAGER_PRE + ".vpc.roleassumption.arn";
-	private static final String CONFIG_DUAL_ACCOUNT = DYNOMITEMANAGER_PRE + ".roleassumption.dualaccount";
+	private static final String CONFIG_ASG_NAME = DM_PREFIX + ".az.asgname";
+	private static final String CONFIG_REGION_NAME = DM_PREFIX + ".az.region";
+	private static final String CONFIG_ACL_GROUP_NAME = DM_PREFIX + ".acl.groupname";
+	private static final String CONFIG_VPC = DM_PREFIX + ".vpc";
+	private static final String CONFIG_EC2_ROLE_ASSUMPTION_ARN = DM_PREFIX + ".ec2.roleassumption.arn";
+	private static final String CONFIG_VPC_ROLE_ASSUMPTION_ARN = DM_PREFIX + ".vpc.roleassumption.arn";
+	private static final String CONFIG_DUAL_ACCOUNT = DM_PREFIX + ".roleassumption.dualaccount";
 
 	// Dynomite Consistency
-	private static final String CONFIG_DYNO_READ_CONS = DYNOMITEMANAGER_PRE + ".dyno.read.consistency";
-	private static final String CONFIG_DYNO_WRITE_CONS = DYNOMITEMANAGER_PRE + ".dyno.write.consistency";
+	private static final String CONFIG_DYNO_READ_CONS = DM_PREFIX + ".dyno.read.consistency";
+	private static final String CONFIG_DYNO_WRITE_CONS = DM_PREFIX + ".dyno.write.consistency";
 
 	// warm up
-	private static final String CONFIG_DYNO_WARM_FORCE = DYNOMITEMANAGER_PRE + ".dyno.warm.force";
-	private static final String CONFIG_DYNO_WARM_BOOTSTRAP = DYNOMITEMANAGER_PRE + ".dyno.warm.bootstrap";
-	private static final String CONFIG_DYNO_ALLOWABLE_BYTES_SYNC_DIFF =
-			DYNOMITEMANAGER_PRE + ".dyno.warm.bytes.sync.diff";
-	private static final String CONFIG_DYNO_MAX_TIME_BOOTSTRAP =
-			DYNOMITEMANAGER_PRE + ".dyno.warm.msec.bootstraptime";
+	private static final String CONFIG_DYNO_WARM_FORCE = DM_PREFIX + ".dyno.warm.force";
+	private static final String CONFIG_DYNO_WARM_BOOTSTRAP = DM_PREFIX + ".dyno.warm.bootstrap";
+	private static final String CONFIG_DYNO_ALLOWABLE_BYTES_SYNC_DIFF = DM_PREFIX + ".dyno.warm.bytes.sync.diff";
+	private static final String CONFIG_DYNO_MAX_TIME_BOOTSTRAP = DM_PREFIX + ".dyno.warm.msec.bootstraptime";
 
 	// Backup and Restore
-	private static final String CONFIG_BACKUP_ENABLED = DYNOMITEMANAGER_PRE + ".dyno.backup.snapshot.enabled";
-	private static final String CONFIG_BUCKET_NAME = DYNOMITEMANAGER_PRE + ".dyno.backup.bucket.name";
-	private static final String CONFIG_S3_BASE_DIR = DYNOMITEMANAGER_PRE + ".dyno.backup.s3.base_dir";
-	private static final String CONFIG_BACKUP_HOUR = DYNOMITEMANAGER_PRE + ".dyno.backup.hour";
-	private static final String CONFIG_BACKUP_SCHEDULE = DYNOMITEMANAGER_PRE + ".dyno.backup.schedule";
-	private static final String CONFIG_RESTORE_ENABLED = DYNOMITEMANAGER_PRE + ".dyno.backup.restore.enabled";
-	private static final String CONFIG_RESTORE_TIME = DYNOMITEMANAGER_PRE + ".dyno.backup.restore.date";
+	private static final String CONFIG_BACKUP_ENABLED = DM_PREFIX + ".dyno.backup.snapshot.enabled";
+	private static final String CONFIG_BUCKET_NAME = DM_PREFIX + ".dyno.backup.bucket.name";
+	private static final String CONFIG_S3_BASE_DIR = DM_PREFIX + ".dyno.backup.s3.base_dir";
+	private static final String CONFIG_BACKUP_HOUR = DM_PREFIX + ".dyno.backup.hour";
+	private static final String CONFIG_BACKUP_SCHEDULE = DM_PREFIX + ".dyno.backup.schedule";
+	private static final String CONFIG_RESTORE_ENABLED = DM_PREFIX + ".dyno.backup.restore.enabled";
+	private static final String CONFIG_RESTORE_TIME = DM_PREFIX + ".dyno.backup.restore.date";
 
 	// persistence
-	private static final String CONFIG_PERSISTENCE_ENABLED = DYNOMITEMANAGER_PRE + ".dyno.persistence.enabled";
-	private static final String CONFIG_PERSISTENCE_TYPE = DYNOMITEMANAGER_PRE + ".dyno.persistence.type";
-	private static final String CONFIG_PERSISTENCE_DIR = DYNOMITEMANAGER_PRE + ".dyno.persistence.directory";
+	private static final String CONFIG_PERSISTENCE_ENABLED = DM_PREFIX + ".dyno.persistence.enabled";
+	private static final String CONFIG_PERSISTENCE_TYPE = DM_PREFIX + ".dyno.persistence.type";
+	private static final String CONFIG_PERSISTENCE_DIR = DM_PREFIX + ".dyno.persistence.directory";
 
 	// VPC
-	private static final String CONFIG_INSTANCE_DATA_RETRIEVER = DYNOMITEMANAGER_PRE + ".instanceDataRetriever";
+	private static final String CONFIG_INSTANCE_DATA_RETRIEVER = DM_PREFIX + ".instanceDataRetriever";
 
 	// Defaults
 	private final String DEFAULT_CLUSTER_NAME = "dynomite_demo1";
 	private final String DEFAULT_SEED_PROVIDER = "dynomitemanager_provider";
-	private final String DEFAULT_DYN_HOME_DIR = "/apps/dynomite";
-	private final String DEFAULT_DYN_START_SCRIPT = "/apps/dynomite/bin/launch_dynomite.sh";
-	private final String DEFAULT_DYN_STOP_SCRIPT = "/apps/dynomite/bin/kill_dynomite.sh";
 
 	private final String DEFAULT_MEMCACHED_START_SCRIPT = "/apps/memcached/bin/memcached";
 	private final String DEFAULT_MEMCACHED_STOP_SCRIPT = "/usr/bin/pkill memcached";
-
-	private final String DEFAULT_REDIS_START_SCRIPT = "/apps/nfredis/bin/launch_nfredis.sh";
-	private final String DEFAULT_REDIS_STOP_SCRIPT = "/apps/nfredis/bin/kill_redis.sh";
 
 	private List<String> DEFAULT_AVAILABILITY_ZONES = ImmutableList.of();
 	private List<String> DEFAULT_AVAILABILITY_RACKS = ImmutableList.of();
@@ -170,6 +204,8 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	private final String DEFAULT_SECURED_OPTION = "datacenter";
 
 	// Backup & Restore
+	// ----------------
+
 	private static final boolean DEFAULT_BACKUP_ENABLED = false;
 	private static final boolean DEFAULT_RESTORE_ENABLED = false;
 	//private static final String DEFAULT_BUCKET_NAME = "us-east-1.dynomite-backup-test";
@@ -185,11 +221,6 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	private static final String DEFAULT_RESTORE_TIME = "20101010";
 	private static final String DEFAULT_BACKUP_SCHEDULE = "day";
 	private static final int DEFAULT_BACKUP_HOUR = 12;
-
-	// Persistence
-	private static final boolean DEFAULT_PERSISTENCE_ENABLED = false;
-	private static final String DEFAULT_PERSISTENCE_TYPE = "aof";
-	private static final String DEFAULT_PERSISTENCE_DIR = "/mnt/data/nfredis";
 
 	// AWS Dual Account
 	private static final boolean DEFAULT_DUAL_ACCOUNT = false;
@@ -723,6 +754,18 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	public boolean isEurekaHostSupplierEnabled() {
 		return configSource
 				.get(CONFIG_IS_EUREKA_HOST_SUPPLIER_ENABLED, DEFAULT_IS_EUREKA_HOST_SUPPLIER_ENABLED);
+	}
+
+	// Redis
+	// =====
+
+	/**
+	 * Get the full path to the redis.conf configuration file.
+	 * @return the {@link String} full path to the redis.conf configuration file
+	 */
+	@Override
+	public String getRedisConf() {
+		return configSource.get(CONFIG_REDIS_CONF, DYNO_REDIS_CONF_PATH);
 	}
 
 }
