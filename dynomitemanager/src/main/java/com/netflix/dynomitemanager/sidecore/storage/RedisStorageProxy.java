@@ -133,14 +133,12 @@ public class RedisStorageProxy implements IStorageProxy {
 			} else {
 				logger.info("starting Redis BGSAVE");
 				localJedis.bgsave();
-
 			}
-				/* We want to check if a bgrewriteaof was already scheduled or it has started. If a bgrewriteaof was
-				 * already scheduled then we should get an error from Redis but should continue.
-				 * If a bgrewriteaof has started, we should also continue.
-				 * Otherwise we may be having old data in the disk.
-				 */
 		} catch (JedisDataException e) {
+			// Check if a bgrewriteaof was already scheduled or it has started. If a bgrewriteaof
+			// was already scheduled then we should get an error from Redis but should continue. If a
+			// bgrewriteaof has started, we should also continue. Otherwise we may be having old data in the
+			// disk.
 			String scheduled = null;
 			if (!config.isAof()) {
 				scheduled = "ERR Background save already in progress";
@@ -316,7 +314,7 @@ public class RedisStorageProxy implements IStorageProxy {
 			String alivePeer = longestAlivePeer.selectedPeer;
 			peerJedis = longestAlivePeer.selectedJedis;
 
-			logger.info("Issue slaveof command on peer [" + alivePeer + "] and port [" + REDIS_PORT + "]");
+			logger.info("Issue SLAVEOF command on peer [" + alivePeer + "] and port [" + REDIS_PORT + "]");
 			startPeerSync(alivePeer, REDIS_PORT);
 
 			long diff = 0;
@@ -490,9 +488,7 @@ public class RedisStorageProxy implements IStorageProxy {
 	}
 
 	private class RedisSyncException extends Exception {
-		/**
-		 * Exception during peer syncing
-		 */
+		// Exception during peer syncing
 		private static final long serialVersionUID = -7736577871204223637L;
 	}
 

@@ -359,4 +359,14 @@ public class SimpleTestConfiguration implements IConfiguration {
 	public String getRedisConf() {
 		return null;
 	}
+
+	@Override
+	public String getRedisAofFilename() {
+		return null;
+	}
+
+	@Override
+	public String getRedisRdbFilename() {
+		return null;
+	}
 }

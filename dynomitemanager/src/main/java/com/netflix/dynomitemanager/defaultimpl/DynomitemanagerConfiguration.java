@@ -61,7 +61,7 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	// Full path to redis.conf.
 	// Netflix:    /apps/nfredis/conf/redis.conf
 	// DynomiteDB: /etc/dynomitedb/redis.conf
-	public static final String DYNO_REDIS_CONF_PATH = "/apps/nfredis/conf/redis.conf";
+	public static final String DEFAULT_REDIS_CONF = "/apps/nfredis/conf/redis.conf";
 	private static final String CONFIG_REDIS_CONF = DM_PREFIX + ".redis.conf";
 
 	public static final int REDIS_PORT = 22122;
@@ -77,9 +77,22 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	private static final String CONFIG_REDIS_STOP_STOP = DM_PREFIX + ".redis.stopscript";
 
 	// Persistence
-	private static final boolean DEFAULT_PERSISTENCE_ENABLED = false;
-	private static final String DEFAULT_PERSISTENCE_TYPE = "aof";
-	private static final String DEFAULT_PERSISTENCE_DIR = "/mnt/data/nfredis";
+	private static final boolean DEFAULT_REDIS_PERSISTENCE_ENABLED = false;
+	private static final String CONFIG_REDIS_PERSISTENCE_ENABLED = DM_PREFIX + ".dyno.persistence.enabled";
+
+	// Type: aof, rdb
+	private static final String DEFAULT_REDIS_PERSISTENCE_TYPE = "aof";
+	private static final String CONFIG_REDIS_PERSISTENCE_TYPE = DM_PREFIX + ".dyno.persistence.type";
+
+	// Directory where the .aof or .rdb file is written
+	private static final String DEFAULT_REDIS_PERSISTENCE_DIR = "/mnt/data/nfredis";
+	private static final String CONFIG_REDIS_PERSISTENCE_DIR = DM_PREFIX + ".dyno.persistence.directory";
+
+	// AOF and RDB filenames
+	private static final String DEFAULT_REDIS_AOF_FILENAME = "appendonly.aof";
+	private static final String CONFIG_REDIS_AOF_FILENAME = DM_PREFIX + ".redis.aof.filename";
+	private static final String DEFAULT_REDIS_RDB_FILENAME = "nfredis.rdb";
+	private static final String CONFIG_REDIS_RDB_FILENAME = DM_PREFIX + ".redis.rdb.filename";
 
 	// Dynomite
 	// ========
@@ -169,11 +182,6 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	private static final String CONFIG_BACKUP_SCHEDULE = DM_PREFIX + ".dyno.backup.schedule";
 	private static final String CONFIG_RESTORE_ENABLED = DM_PREFIX + ".dyno.backup.restore.enabled";
 	private static final String CONFIG_RESTORE_TIME = DM_PREFIX + ".dyno.backup.restore.date";
-
-	// persistence
-	private static final String CONFIG_PERSISTENCE_ENABLED = DM_PREFIX + ".dyno.persistence.enabled";
-	private static final String CONFIG_PERSISTENCE_TYPE = DM_PREFIX + ".dyno.persistence.type";
-	private static final String CONFIG_PERSISTENCE_DIR = DM_PREFIX + ".dyno.persistence.directory";
 
 	// VPC
 	private static final String CONFIG_INSTANCE_DATA_RETRIEVER = DM_PREFIX + ".instanceDataRetriever";
@@ -647,7 +655,7 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 
 	@Override
 	public String getPersistenceLocation() {
-		return configSource.get(CONFIG_PERSISTENCE_DIR, DEFAULT_PERSISTENCE_DIR);
+		return configSource.get(CONFIG_REDIS_PERSISTENCE_DIR, DEFAULT_REDIS_PERSISTENCE_DIR);
 	}
 
 	@Override
@@ -695,22 +703,20 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 
 	@Override
 	public boolean isPersistenceEnabled() {
-		return configSource.get(CONFIG_PERSISTENCE_ENABLED, DEFAULT_PERSISTENCE_ENABLED);
+		return configSource.get(CONFIG_REDIS_PERSISTENCE_ENABLED, DEFAULT_REDIS_PERSISTENCE_ENABLED);
 	}
 
 	@Override
 	public boolean isAof() {
-
-		if (configSource.get(CONFIG_PERSISTENCE_TYPE, DEFAULT_PERSISTENCE_TYPE).equals("rdb")) {
+		if (configSource.get(CONFIG_REDIS_PERSISTENCE_TYPE, DEFAULT_REDIS_PERSISTENCE_TYPE).equals("rdb")) {
 			return false;
-		} else if (configSource.get(CONFIG_PERSISTENCE_TYPE, DEFAULT_PERSISTENCE_TYPE).equals("aof")) {
+		} else if (configSource.get(CONFIG_REDIS_PERSISTENCE_TYPE, DEFAULT_REDIS_PERSISTENCE_TYPE).equals("aof")) {
 			return true;
 		} else {
 			logger.error("The persistence type FP is wrong: aof or rdb");
 			logger.error("Defaulting to rdb");
 			return false;
 		}
-
 	}
 
 	// VPC
@@ -765,7 +771,25 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	 */
 	@Override
 	public String getRedisConf() {
-		return configSource.get(CONFIG_REDIS_CONF, DYNO_REDIS_CONF_PATH);
+		return configSource.get(CONFIG_REDIS_CONF, DEFAULT_REDIS_CONF);
+	}
+
+	/**
+	 * Get the name of the AOF file including extension.
+	 * @return the {@link String} AOF filename
+	 */
+	@Override
+	public String getRedisAofFilename() {
+		return configSource.get(CONFIG_REDIS_AOF_FILENAME, DEFAULT_REDIS_AOF_FILENAME);
+	}
+
+	/**
+	 * Get the name of the RDB file including extension.
+	 * @return the {@link String} RDB filename
+	 */
+	@Override
+	public String getRedisRdbFilename() {
+		return configSource.get(CONFIG_REDIS_RDB_FILENAME, DEFAULT_REDIS_RDB_FILENAME);
 	}
 
 }

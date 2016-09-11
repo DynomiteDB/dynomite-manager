@@ -233,4 +233,6 @@ public interface IConfiguration {
 	// =====
 
 	public String getRedisConf();
+	public String getRedisAofFilename();
+	public String getRedisRdbFilename();
 }

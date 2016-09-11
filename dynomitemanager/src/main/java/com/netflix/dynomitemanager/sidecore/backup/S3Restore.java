@@ -83,9 +83,11 @@ public class S3Restore implements Restore {
 					String filepath = null;
 
 					if (config.isAof()) {
-						filepath = config.getPersistenceLocation() + "/appendonly.aof";
+						filepath = config.getPersistenceLocation() + "/" + config
+								.getRedisAofFilename();
 					} else {
-						filepath = config.getPersistenceLocation() + "/nfredis.rdb";
+						filepath = config.getPersistenceLocation() + "/" + config
+								.getRedisRdbFilename();
 					}
 
 					IOUtils.copy(s3object.getObjectContent(),

@@ -175,14 +175,11 @@ public class FloridaStandardTuner implements ProcessTuner {
 		yaml.dump(map, new FileWriter(yamlFile));
 	}
 
-	/**
-	 * Generate redis.conf.
-	 * @throws IOException
-	 */
+	// Generate redis.conf by reading in the existing redis.conf file, then modifying only the necessary lines.
 	private void updateRedisConfiguration() throws IOException {
 		long storeMaxMem = getStoreMaxMem();
 
-		// Updating the file.
+		// Full path to the redis.conf file
 		String redisConf = config.getRedisConf();
 		logger.info("Updating Redis conf: " + redisConf);
 		Path confPath = Paths.get(redisConf);
@@ -190,7 +187,7 @@ public class FloridaStandardTuner implements ProcessTuner {
 
 		// backup the original baked in conf only and not subsequent updates
 		if (!Files.exists(backupPath)) {
-			logger.info("Backing up baked in Redis config at: " + backupPath);
+			logger.info("Backing up original redis.conf: " + backupPath);
 			Files.copy(confPath, backupPath, COPY_ATTRIBUTES);
 		}
 
@@ -198,10 +195,12 @@ public class FloridaStandardTuner implements ProcessTuner {
 			logger.info("Persistence with AOF is enabled");
 		} else if (config.isPersistenceEnabled() && !config.isAof()) {
 			logger.info("Persistence with RDB is enabled");
+		} else {
+			logger.info("Persistence is disabled");
 		}
 
-		// Not using Properties file to load as we want to retain all comments,
-		// and for easy diffing with the ami baked version of the conf file.
+		// Not using Properties file to load as we want to retain all comments, and for easy diffing with the
+		// AMI baked version of the conf file.
 		List<String> lines = Files.readAllLines(confPath, Charsets.UTF_8);
 		boolean saveReplaced = false;
 		for (int i = 0; i < lines.size(); i++) {
@@ -229,7 +228,8 @@ public class FloridaStandardTuner implements ProcessTuner {
 					logger.info("Updating Redis property: " + autoAofRewritePercentage);
 					lines.set(i, autoAofRewritePercentage);
 				} else if (line.matches(REDIS_CONF_SAVE_SCHEDULE)) {
-					String saveSchedule = "# save 60 10000"; // if we select AOF, it is better to stop RDB
+					// if we select AOF, it is better to stop RDB
+					String saveSchedule = "# save 60 10000";
 					logger.info("Updating Redis property: " + saveSchedule);
 					lines.set(i, saveSchedule);
 				}
@@ -240,11 +240,12 @@ public class FloridaStandardTuner implements ProcessTuner {
 					lines.set(i, bgsaveerror);
 				} else if (line.matches(REDIS_CONF_SAVE_SCHEDULE) && !saveReplaced) {
 					saveReplaced = true;
-					String saveSchedule = "save 60 10000"; //after 60 sec if at least 10000 keys changed
+					//after 60 sec if at least 10000 keys changed
+					String saveSchedule = "save 60 10000";
 					logger.info("Updating Redis property: " + saveSchedule);
 					lines.set(i, saveSchedule);
-				} else if (line.matches(
-						REDIS_CONF_APPENDONLY)) { // if we select RDB, it is better to stop AOF
+				} else if (line.matches( REDIS_CONF_APPENDONLY)) {
+					// if we select RDB, it is better to stop AOF
 					String appendOnly = "appendonly no";
 					logger.info("Updating Redis property: " + appendOnly);
 					lines.set(i, appendOnly);
