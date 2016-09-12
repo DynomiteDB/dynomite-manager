@@ -259,7 +259,25 @@ public interface IConfiguration {
 	// Redis
 	// =====
 
+	/**
+	 * Get the full path to the redis.conf configuration file. The default path to redis.conf is:
+	 * <ul>
+	 * <li>Netflix: /apps/nfredis/conf/redis.conf
+	 * <li>DynomiteDB: /etc/dynomitedb/redis.conf
+	 * </ul>
+	 * @return the {@link String} full path to the redis.conf configuration file
+	 */
 	public String getRedisConf();
+
+	/**
+	 * Get the name of the AOF file including extension.
+	 * @return the {@link String} AOF filename
+	 */
 	public String getRedisAofFilename();
+
+	/**
+	 * Get the name of the RDB file including extension.
+	 * @return the {@link String} RDB filename
+	 */
 	public String getRedisRdbFilename();
 }
