@@ -124,7 +124,10 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	private static final String CONFIG_AVAILABILITY_RACKS = DM_PREFIX + ".racks.available";
 
 	private static final String CONFIG_DYN_PROCESS_NAME = DM_PREFIX + ".dyno.processname";
-	private static final String CONFIG_YAML_LOCATION = DM_PREFIX + ".yamlLocation";
+
+	// Full path to the dynomite.yaml file
+	private static final String CONFIG_DYNOMITE_YAML = DM_PREFIX + ".dynomite.yaml";
+
 	private static final String CONFIG_METADATA_KEYSPACE = DM_PREFIX + ".metadata.keyspace";
 	private static final String CONFIG_SECURED_OPTION = DM_PREFIX + ".secured.option";
 	private static final String CONFIG_DYNO_AUTO_EJECT_HOSTS = DM_PREFIX + ".auto.eject.hosts";
@@ -395,16 +398,6 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 		return clusterName;
 	}
 
-	/**
-	 * Get the full path to the directory that contains the dy
-	 * @return
-	 */
-	@Override
-	public String getAppHome() {
-		final String DEFAULT_DYN_HOME_DIR = "/apps/dynomite";
-		return configSource.get(CONFIG_DYN_HOME_DIR, DEFAULT_DYN_HOME_DIR);
-	}
-
 	@Override
 	public String getZone() {
 		return ZONE;
@@ -492,8 +485,10 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 		return configSource.get(CONFIG_DYN_PROCESS_NAME, DEFAULT_DYN_PROCESS_NAME);
 	}
 
-	public String getYamlLocation() {
-		return configSource.get(CONFIG_YAML_LOCATION, getAppHome() + "/conf/dynomite.yml");
+	@Override
+	public String getDynomiteYaml() {
+		final String DEFAULT_DYNOMITE_YAML = "/apps/dynomite/conf/dynomite.yml";
+		return configSource.get(CONFIG_DYNOMITE_YAML, DEFAULT_DYNOMITE_YAML);
 	}
 
 	@Override

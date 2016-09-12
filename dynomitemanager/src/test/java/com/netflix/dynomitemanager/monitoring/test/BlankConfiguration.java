@@ -81,7 +81,7 @@ public class BlankConfiguration implements IConfiguration {
 	}
 
 	@Override
-	public String getYamlLocation() {
+	public String getDynomiteYaml() {
 		return null;
 	}
 
@@ -311,11 +311,6 @@ public class BlankConfiguration implements IConfiguration {
 	}
 
 	@Override
-	public String getAppHome() {
-		return null;
-	}
-
-	@Override
 	public int getAllowableBytesSyncDiff() {
 		return 0;
 	}
@@ -354,6 +349,9 @@ public class BlankConfiguration implements IConfiguration {
 	public boolean isForceWarm() {
 		return false;
 	}
+
+	// Redis
+	// =====
 
 	@Override
 	public String getRedisConf() {

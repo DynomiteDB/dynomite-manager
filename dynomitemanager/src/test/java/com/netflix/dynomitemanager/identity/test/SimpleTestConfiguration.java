@@ -81,7 +81,7 @@ public class SimpleTestConfiguration implements IConfiguration {
 	}
 
 	@Override
-	public String getYamlLocation() {
+	public String getDynomiteYaml() {
 		return null;
 	}
 
@@ -308,11 +308,6 @@ public class SimpleTestConfiguration implements IConfiguration {
 	@Override
 	public String getAppName() {
 		return "DynomiteManagerTestApp";
-	}
-
-	@Override
-	public String getAppHome() {
-		return null;
 	}
 
 	@Override

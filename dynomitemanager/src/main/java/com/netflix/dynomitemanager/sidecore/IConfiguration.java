@@ -22,11 +22,6 @@ public interface IConfiguration {
 	public void initialize();
 
 	/**
-	 * @return Path to the home dir of target application
-	 */
-	public String getAppHome();
-
-	/**
 	 * @return Path to target application startup script
 	 */
 	public String getAppStartupScript();
@@ -126,7 +121,11 @@ public interface IConfiguration {
 
 	public int getListenerPort();
 
-	public String getYamlLocation();
+	/**
+	 * Get the full path to the dynomite.yaml file.
+	 * @return {@link String} full path to the dynomite.yaml file
+	 */
+	public String getDynomiteYaml();
 
 	public boolean getAutoEjectHosts();
 
