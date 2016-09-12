@@ -35,6 +35,7 @@ import com.netflix.dynomitemanager.IFloridaProcess;
 import com.netflix.dynomitemanager.IInstanceState;
 import com.netflix.dynomitemanager.InstanceState;
 import com.netflix.dynomitemanager.identity.CassandraInstanceFactory;
+import com.netflix.dynomitemanager.identity.DynamoInstanceFactory;
 import com.netflix.dynomitemanager.identity.DefaultVpcInstanceEnvIdentity;
 import com.netflix.dynomitemanager.identity.IAppsInstanceFactory;
 import com.netflix.dynomitemanager.identity.IMembership;
@@ -120,6 +121,7 @@ public class InjectedWebListener extends GuiceServletContextListener {
 			binder().bind(IConfiguration.class).to(DynomitemanagerConfiguration.class);
 			binder().bind(ProcessTuner.class).to(FloridaStandardTuner.class);
 			binder().bind(IAppsInstanceFactory.class).to(CassandraInstanceFactory.class);
+			binder().bind(IAppsInstanceFactory.class).to(DynamoInstanceFactory.class);
 			binder().bind(SchedulerFactory.class).to(StdSchedulerFactory.class).asEagerSingleton();
 			binder().bind(IFloridaProcess.class).to(FloridaProcessManager.class);
 			binder().bind(IStorageProxy.class).to(RedisStorageProxy.class);
