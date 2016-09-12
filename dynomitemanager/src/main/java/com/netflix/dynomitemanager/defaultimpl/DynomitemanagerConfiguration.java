@@ -58,40 +58,27 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	// Redis
 	// =====
 
-	// Full path to redis.conf.
-	// Netflix:    /apps/nfredis/conf/redis.conf
-	// DynomiteDB: /etc/dynomitedb/redis.conf
-	public static final String DEFAULT_REDIS_CONF = "/apps/nfredis/conf/redis.conf";
+	// Full path to redis.conf
 	private static final String CONFIG_REDIS_CONF = DM_PREFIX + ".redis.conf";
 
+	// Redis's port. Do NOT expose this port externally. Block via iptables, SGs, or similar.
 	public static final int REDIS_PORT = 22122;
 
-	// Full path to Redis init scripts to start/stop redis-server.
-	// Netflix:    /apps/nfredis/bin/launch_nfredis.sh
-	//             /apps/nfredis/bin/kill_redis.sh
-	// DynomiteDB: /etc/init.d/dynomitedb-redis start
-	//             /etc/init.d/dynomitedb-redis stop
-	private final String DEFAULT_REDIS_START_SCRIPT = "/apps/nfredis/bin/launch_nfredis.sh";
+	// Full path to Redis init scripts to start/stop redis-server
 	private static final String CONFIG_REDIS_START_SCRIPT = DM_PREFIX + ".redis.startscript";
-	private final String DEFAULT_REDIS_STOP_SCRIPT = "/apps/nfredis/bin/kill_redis.sh";
-	private static final String CONFIG_REDIS_STOP_STOP = DM_PREFIX + ".redis.stopscript";
+	private static final String CONFIG_REDIS_STOP_SCRIPT = DM_PREFIX + ".redis.stopscript";
 
-	// Persistence
-	private static final boolean DEFAULT_REDIS_PERSISTENCE_ENABLED = false;
+	// Enable/disable persistence
 	private static final String CONFIG_REDIS_PERSISTENCE_ENABLED = DM_PREFIX + ".dyno.persistence.enabled";
 
-	// Type: aof, rdb
-	private static final String DEFAULT_REDIS_PERSISTENCE_TYPE = "aof";
+	// Persistence type: aof, rdb
 	private static final String CONFIG_REDIS_PERSISTENCE_TYPE = DM_PREFIX + ".dyno.persistence.type";
 
 	// Directory where the .aof or .rdb file is written
-	private static final String DEFAULT_REDIS_PERSISTENCE_DIR = "/mnt/data/nfredis";
 	private static final String CONFIG_REDIS_PERSISTENCE_DIR = DM_PREFIX + ".dyno.persistence.directory";
 
 	// AOF and RDB filenames
-	private static final String DEFAULT_REDIS_AOF_FILENAME = "appendonly.aof";
 	private static final String CONFIG_REDIS_AOF_FILENAME = DM_PREFIX + ".redis.aof.filename";
-	private static final String DEFAULT_REDIS_RDB_FILENAME = "nfredis.rdb";
 	private static final String CONFIG_REDIS_RDB_FILENAME = DM_PREFIX + ".redis.rdb.filename";
 
 	// Dynomite
@@ -100,7 +87,6 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	// Full path to the root of Dynomite's installation directory.
 	// Netflix:    /apps/dynomite
 	// DynomiteDB: /etc/dynomitedb
-	private final String DEFAULT_DYN_HOME_DIR = "/apps/dynomite";
 	private static final String CONFIG_DYN_HOME_DIR = DM_PREFIX + ".dyno.home";
 
 	// Init script to start/stop the dynomite process.
@@ -409,8 +395,13 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 		return clusterName;
 	}
 
+	/**
+	 * Get the full path to the directory that contains the dy
+	 * @return
+	 */
 	@Override
 	public String getAppHome() {
+		final String DEFAULT_DYN_HOME_DIR = "/apps/dynomite";
 		return configSource.get(CONFIG_DYN_HOME_DIR, DEFAULT_DYN_HOME_DIR);
 	}
 
@@ -623,20 +614,40 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 		return configSource.get(CONFIG_DYNO_STORAGE_MEM_PCT_INT, 85);
 	}
 
+	/**
+	 * Get the full path to the storage engine's (ex. Redis) start init script. The default start init script is:
+	 * <ul>
+	 * <li>Netflix: /apps/nfredis/bin/launch_nfredis.sh
+	 * <li>DynomiteDB: /etc/init.d/dynomitedb-redis start
+	 * </ul>
+	 * @return {@link String} full path to the storage engine's (ex. Redis) start init script
+	 */
 	@Override
 	public String getStorageStartupScript() {
+		final String DEFAULT_REDIS_START_SCRIPT = "/apps/nfredis/bin/launch_nfredis.sh";
+
 		if (getClusterType() == 0)
 			return DEFAULT_MEMCACHED_START_SCRIPT;
 
-		return DEFAULT_REDIS_START_SCRIPT;
+		return configSource.get(CONFIG_REDIS_START_SCRIPT, DEFAULT_REDIS_START_SCRIPT);
 	}
 
+	/**
+	 * Get the full path to the storage engine's (ex. Redis) stop init script. The default stop init script is:
+	 * <ul>
+	 * <li>Netflix: /apps/nfredis/bin/kill_redis.sh
+	 * <li>DynomiteDB: /etc/init.d/dynomitedb-redis stop
+	 * </ul>
+	 * @return {@link String} full path to the storage engine's (ex. Redis) stop init script
+	 */
 	@Override
 	public String getStorageStopScript() {
+		final String DEFAULT_REDIS_STOP_SCRIPT = "/apps/nfredis/bin/kill_redis.sh";
+
 		if (getClusterType() == 0)
 			return DEFAULT_MEMCACHED_STOP_SCRIPT;
 
-		return DEFAULT_REDIS_STOP_SCRIPT;
+		return configSource.get(CONFIG_REDIS_STOP_SCRIPT, DEFAULT_REDIS_STOP_SCRIPT);
 	}
 
 	public int getMbufSize() {
@@ -655,6 +666,7 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 
 	@Override
 	public String getPersistenceLocation() {
+		final String DEFAULT_REDIS_PERSISTENCE_DIR = "/mnt/data/nfredis";
 		return configSource.get(CONFIG_REDIS_PERSISTENCE_DIR, DEFAULT_REDIS_PERSISTENCE_DIR);
 	}
 
@@ -703,11 +715,13 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 
 	@Override
 	public boolean isPersistenceEnabled() {
+		final boolean DEFAULT_REDIS_PERSISTENCE_ENABLED = false;
 		return configSource.get(CONFIG_REDIS_PERSISTENCE_ENABLED, DEFAULT_REDIS_PERSISTENCE_ENABLED);
 	}
 
 	@Override
 	public boolean isAof() {
+		final String DEFAULT_REDIS_PERSISTENCE_TYPE = "aof";
 		if (configSource.get(CONFIG_REDIS_PERSISTENCE_TYPE, DEFAULT_REDIS_PERSISTENCE_TYPE).equals("rdb")) {
 			return false;
 		} else if (configSource.get(CONFIG_REDIS_PERSISTENCE_TYPE, DEFAULT_REDIS_PERSISTENCE_TYPE).equals("aof")) {
@@ -766,11 +780,16 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	// =====
 
 	/**
-	 * Get the full path to the redis.conf configuration file.
+	 * Get the full path to the redis.conf configuration file. The default path to redis.conf is:
+	 * <ul>
+	 * <li>Netflix: /apps/nfredis/conf/redis.conf
+	 * <li>DynomiteDB: /etc/dynomitedb/redis.conf
+	 * </ul>
 	 * @return the {@link String} full path to the redis.conf configuration file
 	 */
 	@Override
 	public String getRedisConf() {
+		final String DEFAULT_REDIS_CONF = "/apps/nfredis/conf/redis.conf";
 		return configSource.get(CONFIG_REDIS_CONF, DEFAULT_REDIS_CONF);
 	}
 
@@ -780,6 +799,7 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	 */
 	@Override
 	public String getRedisAofFilename() {
+		final String DEFAULT_REDIS_AOF_FILENAME = "appendonly.aof";
 		return configSource.get(CONFIG_REDIS_AOF_FILENAME, DEFAULT_REDIS_AOF_FILENAME);
 	}
 
@@ -789,6 +809,7 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	 */
 	@Override
 	public String getRedisRdbFilename() {
+		final String DEFAULT_REDIS_RDB_FILENAME = "nfredis.rdb";
 		return configSource.get(CONFIG_REDIS_RDB_FILENAME, DEFAULT_REDIS_RDB_FILENAME);
 	}
 
