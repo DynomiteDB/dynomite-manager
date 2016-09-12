@@ -131,7 +131,7 @@ public class SimpleTestConfiguration implements IConfiguration {
 	}
 
 	@Override
-	public int getSecuredPeerListenerPort() {
+	public int getPeerListenPortSSL() {
 		return 0;
 	}
 
@@ -181,7 +181,7 @@ public class SimpleTestConfiguration implements IConfiguration {
 	}
 
 	@Override
-	public int getPeerListenerPort() {
+	public int getPeerListenPort() {
 		return 0;
 	}
 
@@ -231,7 +231,7 @@ public class SimpleTestConfiguration implements IConfiguration {
 	}
 
 	@Override
-	public String getDynListenPort() {
+	public String getPeerListenAddress() {
 		return null;
 	}
 

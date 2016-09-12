@@ -96,8 +96,10 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	// Port that Dynomite listens on for Redis client connections (ex. redis-cli, Jedis)
 	private static final String CONFIG_DYNOMITE_LISTEN_PORT = DM_PREFIX + ".dynomite.port";
 
-	private static final String CONFIG_DYN_PEER_PORT_NAME = DM_PREFIX + ".dyno.peer.port";
-	private static final String CONFIG_DYN_SECURED_PEER_PORT_NAME = DM_PREFIX + ".dyno.secured.peer.port";
+	// Ports used for peer communication (Dynomite-to-Dynomite) for internal cluster communication
+	private static final String CONFIG_DYNOMITE_PEER_PORT = DM_PREFIX + ".dynomite.peer.port";
+	private static final String CONFIG_DYNOMITE_PEER_PORT_SSL = DM_PREFIX + ".dynomite.peer.port.ssl";
+
 	private static final String CONFIG_RACK_NAME = DM_PREFIX + ".dyno.rack";
 	private static final String CONFIG_USE_ASG_FOR_RACK_NAME = DM_PREFIX + ".dyno.asg.rack";
 	private static final String CONFIG_TOKENS_DISTRIBUTION_NAME = DM_PREFIX + ".dyno.tokens.distribution";
@@ -177,8 +179,6 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	private List<String> DEFAULT_AVAILABILITY_RACKS = ImmutableList.of();
 
 	private final String DEFAULT_DYN_PROCESS_NAME = "dynomite";
-	private final int DEFAULT_DYN_SECURED_PEER_PORT = 8101;
-	private final int DEFAULT_DYN_PEER_PORT = 8101;
 	private final int DEFAULT_DYN_MEMCACHED_PORT = 11211;
 	private final String DEFAULT_DYN_RACK = "RAC1";
 	private final String DEFAULT_TOKENS_DISTRIBUTION = "vnode";
@@ -534,14 +534,33 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 		return "0.0.0.0:" + getClientListenPort();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * @return {@inheritDoc}
+	 */
 	@Override
-	public int getPeerListenerPort() {
-		return configSource.get(CONFIG_DYN_PEER_PORT_NAME, DEFAULT_DYN_PEER_PORT);
+	public int getPeerListenPort() {
+		final int DEFAULT_DYNOMITE_PEER_PORT = 8101;
+		return configSource.get(CONFIG_DYNOMITE_PEER_PORT, DEFAULT_DYNOMITE_PEER_PORT);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * @return {@inheritDoc}
+	 */
 	@Override
-	public String getDynListenPort() { //return full string
-		return "0.0.0.0:" + getPeerListenerPort();
+	public String getPeerListenAddress() {
+		return "0.0.0.0:" + getPeerListenPort();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @return {@inheritDoc}
+	 */
+	@Override
+	public int getPeerListenPortSSL() {
+		final int DEFAULT_DYNOMITE_PEER_PORT_SSL = 8101;
+		return configSource.get(CONFIG_DYNOMITE_PEER_PORT_SSL, DEFAULT_DYNOMITE_PEER_PORT_SSL);
 	}
 
 	@Override
@@ -588,11 +607,6 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 
 	public boolean isMultiRegionedCluster() {
 		return configSource.get(CONFIG_DYNO_IS_MULTI_REGIONED_CLUSTER, true);
-	}
-
-	@Override
-	public int getSecuredPeerListenerPort() {
-		return configSource.get(CONFIG_DYN_SECURED_PEER_PORT_NAME, DEFAULT_DYN_SECURED_PEER_PORT);
 	}
 
 	public String getSecuredOption() {

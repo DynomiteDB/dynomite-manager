@@ -133,10 +133,6 @@ public interface IConfiguration {
 
 	public String getWriteConsistency();
 
-	public int getPeerListenerPort();
-
-	public int getSecuredPeerListenerPort();
-
 	/**
 	 * Get the port that Dynomite listens on for client connections.
 	 * @return {@link int} the port that Dynomite listens on for client connections
@@ -144,12 +140,33 @@ public interface IConfiguration {
 	public int getClientListenPort();
 
 	/**
-	 * Get the ip-address and port that Dynomite listens on for client connections. This endpoint accepts clients
+	 * Get the IP address and port that Dynomite listens on for client connections. This endpoint accepts clients
 	 * that send/receive the Redis protocol. Requests send to this port are forwarded to the backend data store. Any
 	 * Redis client, such as Jedis or redis-cli, may communicate with Dynomite via the listen address.
-	 * @return {@link String} the ip-address and port that Dynomite listens on for client connections
+	 * @return {@link String} the IP address and port that Dynomite listens on for client connections
 	 */
 	public String getClientListenAddress();
+
+	/**
+	 * Get the port that Dynomite listens on for peer-to-peer communication (i.e. internal cluster communication,
+	 * such as gossip).
+	 * @return {@link int} the port that Dynomite listens on for peer connections from other Dynomite nodes
+	 */
+	public int getPeerListenPort();
+
+	/**
+	 * Get the IP address and port that Dynomite listens on for peer connections. This endpoint accepts connections
+	 * from other Dynomite nodes for internal cluster communication, such as gossip.
+	 * @return {@link String} the IP address and port that Dynomite listens on for peer connections
+	 */
+	public String getPeerListenAddress();
+
+	/**
+	 * Get the SSL port that Dynomite listens on for secure peer-to-peer communication (i.e. internal cluster
+	 * communication, such as gossip).
+	 * @return {@link int} the SSL port that Dynomite listens on for peer connections from other Dynomite nodes
+	 */
+	public int getPeerListenPortSSL();
 
 	/**
 	 * Get the full path to the dynomite.yaml file.
@@ -160,8 +177,6 @@ public interface IConfiguration {
 	public boolean getAutoEjectHosts();
 
 	public String getDistribution();
-
-	public String getDynListenPort();
 
 	public int getGossipInterval();
 

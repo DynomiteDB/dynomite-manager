@@ -296,8 +296,8 @@ public class InstanceIdentity {
             //if (locMap.get(myInstance.getRac()).size() > 1 && locMap.get(myInstance.getRac()).get(0).getHostIP().equals(myInstance.getHostIP()))
             //{
                 //seeds.add(locMap.get(myInstance.getRac()).get(1).getHostName());
-            	//seedp.add(seed + ":" + config.getPeerListenerPort() + ":" + config.getDataCenter() + ":5622637");
-            seeds.add(locMap.get(myInstance.getRac()).get(1).getHostName() + ":" + config.getPeerListenerPort() +
+            	//seedp.add(seed + ":" + config.getPeerListenPort() + ":" + config.getDataCenter() + ":5622637");
+            seeds.add(locMap.get(myInstance.getRac()).get(1).getHostName() + ":" + config.getPeerListenPort() +
             			  ":" + config.getDataCenter() + ":" + locMap.get(myInstance.getRac()).get(1).getToken());
             //}
         }
@@ -308,7 +308,7 @@ public class InstanceIdentity {
         		{
         			//seeds.add(instance.getHostName());
         			seeds.add(instance.getHostName() + ":" +
-        			          config.getPeerListenerPort() + ":" +
+        			          config.getPeerListenPort() + ":" +
         					  config.getDataCenter() + ":" +
         			          instance.getToken());
         		}
@@ -325,7 +325,7 @@ public class InstanceIdentity {
 			if (!ins.getInstanceId().equals(myInstance.getInstanceId())) {
 				logger.debug("Adding node: " + ins.getInstanceId());
 				seeds.add(ins.getHostName() + ":" +
-						config.getPeerListenerPort() + ":" +
+						config.getPeerListenPort() + ":" +
 						ins.getRack() + ":" +
 						ins.getDatacenter() + ":" +
 						ins.getToken());
