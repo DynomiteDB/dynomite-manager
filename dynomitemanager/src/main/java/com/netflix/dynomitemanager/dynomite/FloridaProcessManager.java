@@ -102,7 +102,7 @@ public class FloridaProcessManager implements IFloridaProcess {
 
     protected List<String> getStartCommand() {
 	List<String> startCmd = new LinkedList<String>();
-	for (String param : config.getAppStartupScript().split(" ")) {
+	for (String param : config.getDynomiteStartupScript().split(" ")) {
 	    if (StringUtils.isNotBlank(param))
 		startCmd.add(param);
 	}
@@ -137,7 +137,7 @@ public class FloridaProcessManager implements IFloridaProcess {
 	    command.add("-n");
 	    command.add("-E");
 	}
-	for (String param : config.getAppStopScript().split(" ")) {
+	for (String param : config.getDynomiteStopScript().split(" ")) {
 	    if (StringUtils.isNotBlank(param))
 		command.add(param);
 	}
@@ -163,7 +163,7 @@ public class FloridaProcessManager implements IFloridaProcess {
 
     /**
      * Ping Dynomite to perform a basic health check.
-     * 
+     *
      * @param dynomiteJedis
      *            the Jedis client with a connection to Dynomite.
      * @return true if Dynomite replies to PING with PONG, else false.
@@ -179,7 +179,7 @@ public class FloridaProcessManager implements IFloridaProcess {
 
     /**
      * Basic health check for Dynomite.
-     * 
+     *
      * @return true if health check passes, or false if health check fails.
      */
     private boolean dynomiteRedisCheck() {

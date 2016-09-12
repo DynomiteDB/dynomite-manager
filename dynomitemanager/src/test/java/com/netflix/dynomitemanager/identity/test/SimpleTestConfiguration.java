@@ -296,12 +296,12 @@ public class SimpleTestConfiguration implements IConfiguration {
 	}
 
 	@Override
-	public String getAppStopScript() {
+	public String getDynomiteStopScript() {
 		return null;
 	}
 
 	@Override
-	public String getAppStartupScript() {
+	public String getDynomiteStartupScript() {
 		return null;
 	}
 

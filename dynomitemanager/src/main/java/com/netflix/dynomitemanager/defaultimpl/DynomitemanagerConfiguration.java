@@ -84,20 +84,9 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	// Dynomite
 	// ========
 
-	// Full path to the root of Dynomite's installation directory.
-	// Netflix:    /apps/dynomite
-	// DynomiteDB: /etc/dynomitedb
-	private static final String CONFIG_DYN_HOME_DIR = DM_PREFIX + ".dyno.home";
-
-	// Init script to start/stop the dynomite process.
-	// Netflix:    /apps/dynomite/bin/launch_dynomite.sh
-	//             /apps/dynomite/bin/kill_dynomite.sh
-	// DynomiteDB: /etc/init.d/dynomitedb-dynomite start
-	//             /etc/init.d/dynomitedb-dynomite stop
-	private final String DEFAULT_DYN_START_SCRIPT = "/apps/dynomite/bin/launch_dynomite.sh";
-	private static final String CONFIG_DYN_START_SCRIPT = DM_PREFIX + ".dyno.startscript";
-	private final String DEFAULT_DYN_STOP_SCRIPT = "/apps/dynomite/bin/kill_dynomite.sh";
-	private static final String CONFIG_DYN_STOP_SCRIPT = DM_PREFIX + ".dyno.stopscript";
+	// Init scripts to start/stop the dynomite process.
+	private static final String CONFIG_DYNOMITE_START_SCRIPT = DM_PREFIX + ".dynomite.init.start";
+	private static final String CONFIG_DYNOMITE_STOP_SCRIPT = DM_PREFIX + ".dynomite.init.stop";
 
 	private static final String CONFIG_CLUSTER_NAME = DM_PREFIX + ".dyno.clustername";
 	private static final String CONFIG_SEED_PROVIDER_NAME = DM_PREFIX + ".dyno.seed.provider";
@@ -378,14 +367,24 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 		return configSource.get(CONFIG_USE_ASG_FOR_RACK_NAME, true);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * @return {@inheritDoc}
+	 */
 	@Override
-	public String getAppStartupScript() {
-		return configSource.get(CONFIG_DYN_START_SCRIPT, DEFAULT_DYN_START_SCRIPT);
+	public String getDynomiteStartupScript() {
+		final String DEFAULT_DYNOMITE_START_SCRIPT = "/apps/dynomite/bin/launch_dynomite.sh";
+		return configSource.get(CONFIG_DYNOMITE_START_SCRIPT, DEFAULT_DYNOMITE_START_SCRIPT);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * @return {@inheritDoc}
+	 */
 	@Override
-	public String getAppStopScript() {
-		return configSource.get(CONFIG_DYN_STOP_SCRIPT, DEFAULT_DYN_STOP_SCRIPT);
+	public String getDynomiteStopScript() {
+		final String DEFAULT_DYNOMITE_STOP_SCRIPT = "/apps/dynomite/bin/kill_dynomite.sh";
+		return configSource.get(CONFIG_DYNOMITE_STOP_SCRIPT, DEFAULT_DYNOMITE_STOP_SCRIPT);
 	}
 
 	@Override
@@ -485,6 +484,10 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 		return configSource.get(CONFIG_DYN_PROCESS_NAME, DEFAULT_DYN_PROCESS_NAME);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * @return {@inheritDoc}
+	 */
 	@Override
 	public String getDynomiteYaml() {
 		final String DEFAULT_DYNOMITE_YAML = "/apps/dynomite/conf/dynomite.yml";

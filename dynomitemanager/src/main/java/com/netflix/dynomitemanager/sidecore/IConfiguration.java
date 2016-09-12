@@ -22,14 +22,24 @@ public interface IConfiguration {
 	public void initialize();
 
 	/**
-	 * @return Path to target application startup script
+	 * Get the full path to the Dynomite init start script. The default start script locations are:
+	 * <ul>
+	 * <li>Netflix: /apps/dynomite/bin/launch_dynomite.sh
+	 * <li>DynomiteDB: /etc/init.d/dynomitedb-dynomite start
+	 * </ul>
+	 * @return full path to the Dynomite init start script
 	 */
-	public String getAppStartupScript();
+	public String getDynomiteStartupScript();
 
 	/**
-	 * @return Path to target application stop script
+	 * Get the full path to the Dynomite init stop script. The default stop script locations are:
+	 * <ul>
+	 * <li>Netflix: /apps/dynomite/bin/kill_dynomite.sh
+	 * <li>DynomiteDB: /etc/init.d/dynomitedb-dynomite stop
+	 * </ul>
+	 * @return full path to the Dynomite init stop script
 	 */
-	public String getAppStopScript();
+	public String getDynomiteStopScript();
 
 	/**
 	 * @return Script that starts the storage layer
