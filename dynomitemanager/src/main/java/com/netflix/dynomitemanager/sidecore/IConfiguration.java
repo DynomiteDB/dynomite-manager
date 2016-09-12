@@ -113,9 +113,16 @@ public interface IConfiguration {
 	public String getBootClusterName();
 
 	/**
-	 * @return Get the name of seed provider
+	 * Get the seed provider. Seed provider must be one of:
+	 * <ul>
+	 * <li>dynomitemanager_provider: Dynomite Manager provides the complete topology, which service discovery provides list of health nodes.
+	 * <li>simple_provider: Static list of seeds provided via the seeds.list file.
+	 * <li>florida_provider: Florida provides the complete topology.
+	 * <li>dns_provider: DNS provides the complete topology. This option requires the ability to update DNS as nodes are added/removed from the cluster.
+	 * </ul>
+	 * @return {@link String} the name of seed provider
 	 */
-	public String getSeedProviderName();
+	public String getSeedProvider();
 
 	/**
 	 * @return Process Name

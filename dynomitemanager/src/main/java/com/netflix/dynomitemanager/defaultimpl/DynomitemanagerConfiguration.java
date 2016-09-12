@@ -89,7 +89,10 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	private static final String CONFIG_DYNOMITE_STOP_SCRIPT = DM_PREFIX + ".dynomite.init.stop";
 
 	private static final String CONFIG_DYNOMITE_CLUSTER_NAME = DM_PREFIX + ".dynomite.clustername";
-	private static final String CONFIG_SEED_PROVIDER_NAME = DM_PREFIX + ".dyno.seed.provider";
+
+	// Seed provider determines how Dynomite learns about the cluster topology
+	private static final String CONFIG_DYNOMITE_SEED_PROVIDER = DM_PREFIX + ".dynomite.seed.provider";
+
 	private static final String CONFIG_DYN_LISTENER_PORT_NAME = DM_PREFIX + ".dyno.port";
 	private static final String CONFIG_DYN_PEER_PORT_NAME = DM_PREFIX + ".dyno.peer.port";
 	private static final String CONFIG_DYN_SECURED_PEER_PORT_NAME = DM_PREFIX + ".dyno.secured.peer.port";
@@ -165,8 +168,6 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	private static final String CONFIG_INSTANCE_DATA_RETRIEVER = DM_PREFIX + ".instanceDataRetriever";
 
 	// Defaults
-	private final String DEFAULT_SEED_PROVIDER = "dynomitemanager_provider";
-
 	private final String DEFAULT_MEMCACHED_START_SCRIPT = "/apps/memcached/bin/memcached";
 	private final String DEFAULT_MEMCACHED_STOP_SCRIPT = "/usr/bin/pkill memcached";
 
@@ -478,9 +479,14 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 		return configSource.get(CONFIG_BOOTCLUSTER_NAME, DEFAULT_BOOTCLUSTER_NAME);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * @return {@inheritDoc}
+	 */
 	@Override
-	public String getSeedProviderName() {
-		return configSource.get(CONFIG_SEED_PROVIDER_NAME, DEFAULT_SEED_PROVIDER);
+	public String getSeedProvider() {
+		final String DEFAULT_DYNOMITE_SEED_PROVIDER = "dynomitemanager_provider";
+		return configSource.get(CONFIG_DYNOMITE_SEED_PROVIDER, DEFAULT_DYNOMITE_SEED_PROVIDER);
 	}
 
 	@Override

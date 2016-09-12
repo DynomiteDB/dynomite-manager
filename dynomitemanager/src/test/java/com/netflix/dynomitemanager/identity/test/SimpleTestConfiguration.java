@@ -126,7 +126,7 @@ public class SimpleTestConfiguration implements IConfiguration {
 	}
 
 	@Override
-	public String getSeedProviderName() {
+	public String getSeedProvider() {
 		return null;
 	}
 
