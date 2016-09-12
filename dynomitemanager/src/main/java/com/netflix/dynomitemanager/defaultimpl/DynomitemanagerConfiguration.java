@@ -69,13 +69,13 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	private static final String CONFIG_REDIS_STOP_SCRIPT = DM_PREFIX + ".redis.stopscript";
 
 	// Enable/disable persistence
-	private static final String CONFIG_REDIS_PERSISTENCE_ENABLED = DM_PREFIX + ".dyno.persistence.enabled";
+	private static final String CONFIG_REDIS_PERSISTENCE_ENABLED = DM_PREFIX + ".redis.persistence.enabled";
 
 	// Persistence type: aof, rdb
-	private static final String CONFIG_REDIS_PERSISTENCE_TYPE = DM_PREFIX + ".dyno.persistence.type";
+	private static final String CONFIG_REDIS_PERSISTENCE_TYPE = DM_PREFIX + ".redis.persistence.type";
 
 	// Directory where the .aof or .rdb file is written
-	private static final String CONFIG_REDIS_PERSISTENCE_DIR = DM_PREFIX + ".dyno.persistence.directory";
+	private static final String CONFIG_REDIS_PERSISTENCE_DIR = DM_PREFIX + ".redis.persistence.directory";
 
 	// AOF and RDB filenames
 	private static final String CONFIG_REDIS_AOF_FILENAME = DM_PREFIX + ".redis.aof.filename";
