@@ -287,7 +287,7 @@ public class RedisStorageProxy implements IStorageProxy {
 
 		for (String peer : peers) { //Looking into the peers with the same token
 			logger.info("Peer node [" + peer + "] has the same token!");
-			peerJedis = JedisUtils.connect(peer, config.getListenerPort());
+			peerJedis = JedisUtils.connect(peer, config.getClientListenPort());
 			if (peerJedis != null
 					&& isAlive()) {   // Checking if there are peers, and if so if they are alive
 

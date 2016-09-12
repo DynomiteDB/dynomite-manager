@@ -201,7 +201,7 @@ public class SimpleTestConfiguration implements IConfiguration {
 	}
 
 	@Override
-	public int getListenerPort() {
+	public int getClientListenPort() {
 		return 0;
 	}
 
@@ -251,7 +251,7 @@ public class SimpleTestConfiguration implements IConfiguration {
 	}
 
 	@Override
-	public String getClientListenPort() {
+	public String getClientListenAddress() {
 		return null;
 	}
 

@@ -93,7 +93,9 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	// Seed provider determines how Dynomite learns about the cluster topology
 	private static final String CONFIG_DYNOMITE_SEED_PROVIDER = DM_PREFIX + ".dynomite.seed.provider";
 
-	private static final String CONFIG_DYN_LISTENER_PORT_NAME = DM_PREFIX + ".dyno.port";
+	// Port that Dynomite listens on for Redis client connections (ex. redis-cli, Jedis)
+	private static final String CONFIG_DYNOMITE_LISTEN_PORT = DM_PREFIX + ".dynomite.port";
+
 	private static final String CONFIG_DYN_PEER_PORT_NAME = DM_PREFIX + ".dyno.peer.port";
 	private static final String CONFIG_DYN_SECURED_PEER_PORT_NAME = DM_PREFIX + ".dyno.secured.peer.port";
 	private static final String CONFIG_RACK_NAME = DM_PREFIX + ".dyno.rack";
@@ -175,7 +177,6 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	private List<String> DEFAULT_AVAILABILITY_RACKS = ImmutableList.of();
 
 	private final String DEFAULT_DYN_PROCESS_NAME = "dynomite";
-	private final int DEFAULT_DYN_LISTENER_PORT = 8102;
 	private final int DEFAULT_DYN_SECURED_PEER_PORT = 8101;
 	private final int DEFAULT_DYN_PEER_PORT = 8101;
 	private final int DEFAULT_DYN_MEMCACHED_PORT = 11211;
@@ -514,14 +515,23 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 		return configSource.get(CONFIG_TOKENS_DISTRIBUTION_NAME, DEFAULT_TOKENS_DISTRIBUTION);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * @return {@inheritDoc}
+	 */
 	@Override
-	public int getListenerPort() {
-		return configSource.get(CONFIG_DYN_LISTENER_PORT_NAME, DEFAULT_DYN_LISTENER_PORT);
+	public int getClientListenPort() {
+		final int DEFAULT_DYNOMITE_LISTEN_PORT = 8102;
+		return configSource.get(CONFIG_DYNOMITE_LISTEN_PORT, DEFAULT_DYNOMITE_LISTEN_PORT);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * @return {@inheritDoc}
+	 */
 	@Override
-	public String getClientListenPort() {
-		return "0.0.0.0:" + getListenerPort();
+	public String getClientListenAddress() {
+		return "0.0.0.0:" + getClientListenPort();
 	}
 
 	@Override

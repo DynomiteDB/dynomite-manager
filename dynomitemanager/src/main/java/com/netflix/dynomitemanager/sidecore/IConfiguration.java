@@ -137,7 +137,19 @@ public interface IConfiguration {
 
 	public int getSecuredPeerListenerPort();
 
-	public int getListenerPort();
+	/**
+	 * Get the port that Dynomite listens on for client connections.
+	 * @return {@link int} the port that Dynomite listens on for client connections
+	 */
+	public int getClientListenPort();
+
+	/**
+	 * Get the ip-address and port that Dynomite listens on for client connections. This endpoint accepts clients
+	 * that send/receive the Redis protocol. Requests send to this port are forwarded to the backend data store. Any
+	 * Redis client, such as Jedis or redis-cli, may communicate with Dynomite via the listen address.
+	 * @return {@link String} the ip-address and port that Dynomite listens on for client connections
+	 */
+	public String getClientListenAddress();
 
 	/**
 	 * Get the full path to the dynomite.yaml file.
@@ -154,8 +166,6 @@ public interface IConfiguration {
 	public int getGossipInterval();
 
 	public String getHash();
-
-	public String getClientListenPort();
 
 	public boolean getPreconnect();
 
