@@ -101,7 +101,7 @@ public class InstanceIdentity {
 			@Override
 			public AppsInstance retriableCall() throws Exception {
 				// Check if this node is decommissioned
-				for (AppsInstance ins : factory.getAllIds(config.getAppName() + "-dead")) {
+				for (AppsInstance ins : factory.getAllIds(config.getClusterName() + "-dead")) {
 					logger.debug(String.format("[Dead] Iterating though the hosts: %s",
 							ins.getInstanceId()));
 					if (ins.getInstanceId().equals(config.getInstanceName())) {
@@ -109,7 +109,7 @@ public class InstanceIdentity {
 						return ins;
 					}
 				}
-				for (AppsInstance ins : factory.getAllIds(config.getAppName())) {
+				for (AppsInstance ins : factory.getAllIds(config.getClusterName())) {
 					logger.debug(String
 							.format("[Alive] Iterating though the hosts: %s My id = [%s]",
 									ins.getInstanceId(), ins.getId()));
@@ -139,7 +139,7 @@ public class InstanceIdentity {
 
 	private void populateRacMap() {
 		locMap.clear();
-		for (AppsInstance ins : factory.getAllIds(config.getAppName())) {
+		for (AppsInstance ins : factory.getAllIds(config.getClusterName())) {
 			locMap.put(ins.getZone(), ins);
 		}
 	}
@@ -172,7 +172,7 @@ public class InstanceIdentity {
 	public class GetDeadToken extends RetryableCallable<AppsInstance> {
 		@Override
 		public AppsInstance retriableCall() throws Exception {
-			final List<AppsInstance> allIds = factory.getAllIds(config.getAppName());
+			final List<AppsInstance> allIds = factory.getAllIds(config.getClusterName());
 			List<String> asgInstances = membership.getRacMembership();
 			if (config.isDualAccount()) {
 				asgInstances = getDualAccountRacMembership(asgInstances);
@@ -197,7 +197,7 @@ public class InstanceIdentity {
 				String payLoad = dead.getToken();
 				logger.info("Trying to grab slot {} with availability zone {}", dead.getId(),
 						dead.getZone());
-				return factory.create(config.getAppName(), dead.getId(), config.getInstanceName(),
+				return factory.create(config.getClusterName(), dead.getId(), config.getInstanceName(),
 						config.getHostname(), config.getHostIP(), config.getZone(),
 						dead.getVolumes(), payLoad, config.getRack());
 			}
@@ -213,7 +213,7 @@ public class InstanceIdentity {
 		@Override
 		public AppsInstance retriableCall() throws Exception {
 			logger.info("Looking for any pre-generated token");
-			final List<AppsInstance> allIds = factory.getAllIds(config.getAppName());
+			final List<AppsInstance> allIds = factory.getAllIds(config.getClusterName());
 			List<String> asgInstances = membership.getRacMembership();
 			// Sleep random interval - upto 15 sec
 			sleeper.sleep(new Random().nextInt(5000) + 10000);
@@ -232,7 +232,7 @@ public class InstanceIdentity {
 				String payLoad = dead.getToken();
 				logger.info("Trying to grab slot {} with availability zone {}", dead.getId(),
 						dead.getRack());
-				return factory.create(config.getAppName(), dead.getId(), config.getInstanceName(),
+				return factory.create(config.getClusterName(), dead.getId(), config.getInstanceName(),
 						config.getHostname(), config.getHostIP(), config.getZone(),
 						dead.getVolumes(), payLoad, config.getRack());
 			}
@@ -271,7 +271,7 @@ public class InstanceIdentity {
 			//String payload = tokenManager.createToken(my_slot, membership.getRacCount(), membership.getRacMembershipSize(), config.getDataCenter());
 			String payload = tokenManager
 					.createToken(my_slot, membership.getRacMembershipSize(), config.getRack());
-			return factory.create(config.getAppName(), my_slot + hash, config.getInstanceName(),
+			return factory.create(config.getClusterName(), my_slot + hash, config.getInstanceName(),
 					config.getHostname(), config.getHostIP(), config.getZone(), null, payload,
 					config.getRack());
 		}
@@ -321,7 +321,7 @@ public class InstanceIdentity {
 		//populateRacMap();
 		List<String> seeds = new LinkedList<String>();
 
-		for (AppsInstance ins : factory.getAllIds(config.getAppName())) {
+		for (AppsInstance ins : factory.getAllIds(config.getClusterName())) {
 			if (!ins.getInstanceId().equals(myInstance.getInstanceId())) {
 				logger.debug("Adding node: " + ins.getInstanceId());
 				seeds.add(ins.getHostName() + ":" +
@@ -338,7 +338,7 @@ public class InstanceIdentity {
 	public List<String> getClusterInfo() throws UnknownHostException {
 		List<String> nodes = new LinkedList<String>();
 
-		for (AppsInstance ins : factory.getAllIds(config.getAppName())) {
+		for (AppsInstance ins : factory.getAllIds(config.getClusterName())) {
 			logger.debug("Adding node: " + ins.getInstanceId());
 			nodes.add("{" +
 					"\"token\":" + "\"" + ins.getToken() + "\"," +

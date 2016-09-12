@@ -52,11 +52,11 @@ public class UpdateSecuritySettings extends Task {
 		// if seed does not execute.
 		int port = config.getPeerListenerPort();
 		List<String> acls = membership.listACL(port, port);
-		List<AppsInstance> instances = factory.getAllIds(config.getAppName());
+		List<AppsInstance> instances = factory.getAllIds(config.getClusterName());
 
 		// iterate to add...
 		List<String> add = Lists.newArrayList();
-		for (AppsInstance instance : factory.getAllIds(config.getAppName())) {
+		for (AppsInstance instance : factory.getAllIds(config.getClusterName())) {
 			String range = instance.getHostIP() + "/32";
 			if (!acls.contains(range))
 				add.add(range);

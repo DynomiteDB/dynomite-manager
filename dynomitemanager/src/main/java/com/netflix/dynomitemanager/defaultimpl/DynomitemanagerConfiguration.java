@@ -88,7 +88,7 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	private static final String CONFIG_DYNOMITE_START_SCRIPT = DM_PREFIX + ".dynomite.init.start";
 	private static final String CONFIG_DYNOMITE_STOP_SCRIPT = DM_PREFIX + ".dynomite.init.stop";
 
-	private static final String CONFIG_CLUSTER_NAME = DM_PREFIX + ".dyno.clustername";
+	private static final String CONFIG_DYNOMITE_CLUSTER_NAME = DM_PREFIX + ".dynomite.clustername";
 	private static final String CONFIG_SEED_PROVIDER_NAME = DM_PREFIX + ".dyno.seed.provider";
 	private static final String CONFIG_DYN_LISTENER_PORT_NAME = DM_PREFIX + ".dyno.port";
 	private static final String CONFIG_DYN_PEER_PORT_NAME = DM_PREFIX + ".dyno.peer.port";
@@ -165,7 +165,6 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	private static final String CONFIG_INSTANCE_DATA_RETRIEVER = DM_PREFIX + ".instanceDataRetriever";
 
 	// Defaults
-	private final String DEFAULT_CLUSTER_NAME = "dynomite_demo1";
 	private final String DEFAULT_SEED_PROVIDER = "dynomitemanager_provider";
 
 	private final String DEFAULT_MEMCACHED_START_SCRIPT = "/apps/memcached/bin/memcached";
@@ -387,12 +386,17 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 		return configSource.get(CONFIG_DYNOMITE_STOP_SCRIPT, DEFAULT_DYNOMITE_STOP_SCRIPT);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * @return {@inheritDoc}
+	 */
 	@Override
-	public String getAppName() {
+	public String getClusterName() {
+		final String DEFAULT_CLUSTER_NAME = "dynomite_demo1";
 		String clusterName = System.getenv("NETFLIX_APP");
 
 		if (StringUtils.isBlank(clusterName))
-			return configSource.get(CONFIG_CLUSTER_NAME, DEFAULT_CLUSTER_NAME);
+			return configSource.get(CONFIG_DYNOMITE_CLUSTER_NAME, DEFAULT_CLUSTER_NAME);
 
 		return clusterName;
 	}
@@ -461,7 +465,7 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 
 	@Override
 	public String getACLGroupName() {
-		return configSource.get(CONFIG_ACL_GROUP_NAME, this.getAppName());
+		return configSource.get(CONFIG_ACL_GROUP_NAME, this.getClusterName());
 	}
 
 	@Override

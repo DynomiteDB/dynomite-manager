@@ -53,9 +53,10 @@ public interface IConfiguration {
 	public String getStorageStopScript();
 
 	/**
-	 * @return Cluster name
+	 * Get the name of the Dynomite cluster.
+	 * @return {@link String} Dynomite cluster name
 	 */
-	public String getAppName();
+	public String getClusterName();
 
 	/**
 	 * @return Zone (or zone for AWS)

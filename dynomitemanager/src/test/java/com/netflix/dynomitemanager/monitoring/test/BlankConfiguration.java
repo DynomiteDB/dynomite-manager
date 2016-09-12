@@ -306,7 +306,7 @@ public class BlankConfiguration implements IConfiguration {
 	}
 
 	@Override
-	public String getAppName() {
+	public String getClusterName() {
 		return null;
 	}
 
