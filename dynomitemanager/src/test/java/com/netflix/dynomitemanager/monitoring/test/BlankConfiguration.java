@@ -268,7 +268,7 @@ public class BlankConfiguration implements IConfiguration {
 	}
 
 	@Override
-	public String getBootClusterName() {
+	public String getCassandraClusterName() {
 		return null;
 	}
 

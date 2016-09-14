@@ -41,13 +41,12 @@ public class LocalHostsSupplier implements HostSupplier {
 	public Supplier<List<Host>> getSupplier(String clusterName) {
 		final List<Host> hosts = new ArrayList<Host>();
 
-		String bootCluster = config.getBootClusterName();
+		String bootCluster = config.getCassandraClusterName();
 
 		if (bootCluster == null)
 			bootCluster = "";
 
 		if (bootCluster.equals(clusterName)) {
-
 			String seeds = System.getenv("DM_CASSANDRA_CLUSTER_SEEDS");
 
 			if (seeds == null || "".equals(seeds))
@@ -62,7 +61,6 @@ public class LocalHostsSupplier implements HostSupplier {
 			for (String cassHost : cassHostnames) {
 				hosts.add(new Host(cassHost, 9160));
 			}
-
 		} else {
 			hosts.add(new Host("127.0.0.1", 9160).setRack("localdc"));
 		}

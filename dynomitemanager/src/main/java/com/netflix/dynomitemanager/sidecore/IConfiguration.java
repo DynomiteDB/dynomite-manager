@@ -107,9 +107,10 @@ public interface IConfiguration {
 	public String getHostIP();
 
 	/**
-	 * @return Bootstrap cluster name (depends on another Cassandra cluster)
+	 * Get the name of the Cassandra cluster that contains the Dynomite cluster topology.
+	 * @return {@link String} the name of the Cassandra cluster used to hold the Dynomite cluster topology
 	 */
-	public String getBootClusterName();
+	public String getCassandraClusterName();
 
 	/**
 	 * Get the seed provider. Seed provider must be one of:

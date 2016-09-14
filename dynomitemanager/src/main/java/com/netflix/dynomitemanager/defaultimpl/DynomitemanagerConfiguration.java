@@ -175,9 +175,10 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	// =========
 	//
 	// Cassandra is used to store the Dynomite cluster topology.
+	//
 
 	// Cassandra Cluster for token management
-	private static final String CONFIG_BOOTCLUSTER_NAME = DM_PREFIX + ".bootcluster";
+	private static final String CONFIG_CASSANDRA_CLUSTER_NAME = DM_PREFIX + ".cassandra.cluster";
 
 	// Name of the Cassandra keyspace that contains the Dynomite cluster topology. If you set this value to anything
 	// other than the default then you must update all scripts in: ./dynomitemanager/src/test/resources/
@@ -269,7 +270,6 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	private final InstanceEnvIdentity insEnvIdentity;
 
 	// Cassandra default configuration
-	private static final String DEFAULT_BOOTCLUSTER_NAME = "cass_dyno";
 	private static final int DEFAULT_CASSANDRA_THRIFT_PORT = 9160; //7102;
 	private static final String DEFAULT_COMMA_SEPARATED_CASSANDRA_HOSTNAMES = "127.0.0.1";
 	private static final boolean DEFAULT_IS_EUREKA_HOST_SUPPLIER_ENABLED = true;
@@ -520,11 +520,6 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	@Override
 	public String getHostIP() {
 		return PUBLIC_IP;
-	}
-
-	@Override
-	public String getBootClusterName() {
-		return configSource.get(CONFIG_BOOTCLUSTER_NAME, DEFAULT_BOOTCLUSTER_NAME);
 	}
 
 	/**
@@ -908,6 +903,20 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	@Override
 	public boolean isDualAccount() {
 		return configSource.get(CONFIG_DUAL_ACCOUNT, DEFAULT_DUAL_ACCOUNT);
+	}
+
+	// Cassandra
+	// =========
+
+	/**
+	 * {@inheritDoc}
+	 * @return {@inheritDoc}
+	 */
+	@Override
+	public String getCassandraClusterName() {
+		final String DEFAULT_CASSANDRA_CLUSTER_NAME = CONFIG_PACKAGE.equals("dynomitedb")
+				? "cassandra_dynomite" : "cass_dyno";
+		return configSource.get(CONFIG_CASSANDRA_CLUSTER_NAME, DEFAULT_CASSANDRA_CLUSTER_NAME);
 	}
 
 	/**
