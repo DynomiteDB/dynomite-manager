@@ -168,7 +168,8 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	// Encryption option for intra-cluster (i.e. node-to-node) communication: none, rack, all, datacenter (default)
 	private static final String CONFIG_DYNOMITE_CLUSTER_ENCRYPTION = DM_PREFIX + ".dynomite.cluster.encryption";
 
-	private static final String CONFIG_DYNO_AUTO_EJECT_HOSTS = DM_PREFIX + ".auto.eject.hosts";
+	// Determine if Dynomite should eject nodes from the cluster automatically
+	private static final String CONFIG_DYNOMITE_AUTO_EJECT_HOSTS = DM_PREFIX + ".dynomite.auto.eject.hosts";
 
 	// Cassandra
 	// =========
@@ -562,9 +563,13 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 		return configSource.get(CONFIG_DYNOMITE_YAML, DEFAULT_DYNOMITE_YAML);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * @return {@inheritDoc}
+	 */
 	@Override
 	public boolean getAutoEjectHosts() {
-		return configSource.get(CONFIG_DYNO_AUTO_EJECT_HOSTS, true);
+		return configSource.get(CONFIG_DYNOMITE_AUTO_EJECT_HOSTS, true);
 	}
 
 	/**

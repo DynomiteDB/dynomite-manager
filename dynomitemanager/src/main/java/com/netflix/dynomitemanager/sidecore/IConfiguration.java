@@ -174,6 +174,11 @@ public interface IConfiguration {
 	 */
 	public String getDynomiteYaml();
 
+	/**
+	 * Get the value of the auto eject hosts setting for dynomite.yaml. If true, Dynomite will remove a node from
+	 * the cluster after server_failure_limit failed attempts. Removal is only temporary.
+	 * @return {@link boolean} value for auto eject hosts determines if Dynomite should remove nodes with consecutive failures
+	 */
 	public boolean getAutoEjectHosts();
 
 	/**
