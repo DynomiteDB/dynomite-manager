@@ -163,7 +163,7 @@ public class BlankConfiguration implements IConfiguration {
 	}
 
 	@Override
-	public String getProcessName() {
+	public String getDynomiteBinary() {
 		return null;
 	}
 

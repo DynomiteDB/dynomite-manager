@@ -93,7 +93,7 @@ public class ProcessMonitorTask extends Task implements StatefulJob {
 			return;
 		}
 
-		instanceState.setStorageProxyProcessAlive(checkProxyProcess());
+		instanceState.setStorageProxyProcessAlive(isDynomiteProcessAlive());
 		instanceState.setStorageProxyAlive(JedisUtils.isAliveWithRetry(JedisConfiguration.REDIS_ADDRESS,
 				JedisConfiguration.DYNO_PORT));
 		instanceState.setStorageAlive(iStorageProxy.isAlive());
@@ -157,22 +157,22 @@ public class ProcessMonitorTask extends Task implements StatefulJob {
 		}
 	}
 
-	private boolean checkProxyProcess() {
+	private boolean isDynomiteProcessAlive() {
 		try {
-			String cmd = String.format("ps -ef | grep  '[/]apps/%1$s/bin/%1$s'", config.getProcessName());
+			String cmd = String.format("ps -ef | grep  '%1$s'", config.getDynomiteBinary());
 			String[] cmdArray = { "/bin/sh", "-c", cmd };
-			logger.info("Running checkProxyProcess command: " + cmd);
+			logger.info("Running isDynomiteProcessAlive command: " + cmd);
 
 			// This returns pid for the Dynomite process
 			Process p = Runtime.getRuntime().exec(cmdArray);
 			BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
 			String line = input.readLine();
 			if (logger.isDebugEnabled()) {
-				logger.debug("Output from checkProxyProcess command: " + line);
+				logger.debug("Output from isDynomiteProcessAlive command: " + line);
 			}
 			return line != null;
 		} catch (Exception e) {
-			logger.warn("Exception thrown while checking if the process is running or not ", e);
+			logger.warn("Exception thrown while checking process status: ", e);
 			return false;
 		}
 	}

@@ -124,9 +124,10 @@ public interface IConfiguration {
 	public String getSeedProvider();
 
 	/**
-	 * @return Process Name
+	 * Get the full path to the dynomite binary.
+	 * @return {@link String} full path to the dynomite binary
 	 */
-	public String getProcessName();
+	public String getDynomiteBinary();
 
 	public String getReadConsistency();
 

@@ -55,6 +55,12 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	public static final int DYNO_PORT = 8102;
 	public final static String LOCAL_ADDRESS = "127.0.0.1";
 
+	// DynomiteDB
+	// ==========
+
+	// Set to "dynomitedb" to set all default values to DynomiteDB specific values.
+	private static final String CONFIG_PACKAGE = DM_PREFIX + ".package";
+
 	// Redis
 	// =====
 
@@ -149,7 +155,9 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	// Maximum number of messages that Dynomite will allocate. Value is passed to Dynomite via env var.
 	private static final String CONFIG_DYNOMITE_MAX_ALLOC_MSGS = DM_PREFIX + ".dynomite.allocated.messages.max";
 
-	private static final String CONFIG_DYN_PROCESS_NAME = DM_PREFIX + ".dyno.processname";
+	// CONFIG_DYNOMITE_PROCESS_NAME is the name of the executable only (i.e. dynomite) and must not be a full path.
+	// Do NOT set this value for the DynomiteDB package.
+	private static final String CONFIG_DYNOMITE_PROCESS_NAME = DM_PREFIX + ".dynomite.processname";
 
 	// Full path to the dynomite.yaml file
 	private static final String CONFIG_DYNOMITE_YAML = DM_PREFIX + ".dynomite.yaml";
@@ -205,7 +213,6 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	private final String DEFAULT_MEMCACHED_START_SCRIPT = "/apps/memcached/bin/memcached";
 	private final String DEFAULT_MEMCACHED_STOP_SCRIPT = "/usr/bin/pkill memcached";
 
-	private final String DEFAULT_DYN_PROCESS_NAME = "dynomite";
 	private final int DEFAULT_DYN_MEMCACHED_PORT = 11211;
 
 	private final String DEFAULT_METADATA_KEYSPACE = "dyno_bootstrap";
@@ -521,9 +528,19 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 		return configSource.get(CONFIG_DYNOMITE_SEED_PROVIDER, DEFAULT_DYNOMITE_SEED_PROVIDER);
 	}
 
+	private String getNetflixDynomiteProcessName() {
+		return configSource.get(CONFIG_DYNOMITE_PROCESS_NAME, "dynomite");
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @return {@inheritDoc}
+	 */
 	@Override
-	public String getProcessName() {
-		return configSource.get(CONFIG_DYN_PROCESS_NAME, DEFAULT_DYN_PROCESS_NAME);
+	public String getDynomiteBinary() {
+		String netflixBinary = String.format("[/]apps/%1$s/bin/%1$s", getNetflixDynomiteProcessName());
+		String dynomiteDBBinary = "/usr/local/sbin/dynomite";
+		return CONFIG_PACKAGE.equals("dynomitedb") ? dynomiteDBBinary : netflixBinary;
 	}
 
 	/**
