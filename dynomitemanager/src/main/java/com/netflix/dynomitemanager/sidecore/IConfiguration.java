@@ -64,11 +64,6 @@ public interface IConfiguration {
 	public String getZone();
 
 	/**
-	 * @return List of all RAC used for the cluster
-	 */
-	public List<String> getZones();
-
-	/**
 	 * @return Local hostname
 	 */
 	public String getHostname();
@@ -90,6 +85,10 @@ public interface IConfiguration {
 	 */
 	public String getRack();
 
+	/**
+	 * Get a list of racks (AWS AZs) in this server's data center (AWS Region).
+	 * @return {@link List} of racks (or AZs) in this server's data center
+	 */
 	public List<String> getRacks();
 
 	/**

@@ -71,11 +71,6 @@ public class BlankConfiguration implements IConfiguration {
 	}
 
 	@Override
-	public List<String> getZones() {
-		return null;
-	}
-
-	@Override
 	public String getZone() {
 		return null;
 	}

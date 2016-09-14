@@ -100,8 +100,19 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	private static final String CONFIG_DYNOMITE_PEER_PORT = DM_PREFIX + ".dynomite.peer.port";
 	private static final String CONFIG_DYNOMITE_PEER_PORT_SSL = DM_PREFIX + ".dynomite.peer.port.ssl";
 
-	private static final String CONFIG_RACK_NAME = DM_PREFIX + ".dyno.rack";
-	private static final String CONFIG_USE_ASG_FOR_RACK_NAME = DM_PREFIX + ".dyno.asg.rack";
+	// Rack
+	// In AWS, if each ASG maps to exactly one AZ, then set CONFIG_DYNOMITE_USE_ASG_AS_RACK = true and do not use
+	// CONFIG_DYNOMITE_RACK. This will set the rack name = asg name. To use CONFIG_DYNOMITE_RACK as the rack name,
+	// set a value for CONFIG_DYNOMITE_RACK and set CONFIG_DYNOMITE_USE_ASG_AS_RACK = false
+	private static final String CONFIG_DYNOMITE_RACK = DM_PREFIX + ".dynomite.rack";
+	private static final String CONFIG_DYNOMITE_USE_ASG_AS_RACK = DM_PREFIX + ".dynomite.asg.rack";
+
+	// Static list of racks within this server's DC. In AWS, leave racks blank and the list of racks will be defined
+	// as the AZs within this server's Region. DEFAULT_DYNOMITE_RACKS is set via the call to setDefaultRacksToAZs() in the
+	// initialize() method.
+	private static final String CONFIG_DYNOMITE_RACKS = DM_PREFIX + ".dynomite.racks";
+	private List<String> DEFAULT_DYNOMITE_RACKS = ImmutableList.of();
+
 	private static final String CONFIG_TOKENS_DISTRIBUTION_NAME = DM_PREFIX + ".dyno.tokens.distribution";
 	private static final String CONFIG_DYNO_REQ_TIMEOUT_NAME = DM_PREFIX + ".dyno.request.timeout"; // in ms
 	private static final String CONFIG_DYNO_GOSSIP_INTERVAL_NAME = DM_PREFIX + ".dyno.gossip.interval"; // in ms
@@ -115,9 +126,6 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 
 	private static final String CONFIG_DYNO_MBUF_SIZE = DM_PREFIX + ".dyno.mbuf.size";
 	private static final String CONFIG_DYNO_MAX_ALLOC_MSGS = DM_PREFIX + ".dyno.allocated.messages";
-
-	private static final String CONFIG_AVAILABILITY_ZONES = DM_PREFIX + ".zones.available";
-	private static final String CONFIG_AVAILABILITY_RACKS = DM_PREFIX + ".racks.available";
 
 	private static final String CONFIG_DYN_PROCESS_NAME = DM_PREFIX + ".dyno.processname";
 
@@ -175,12 +183,8 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	private final String DEFAULT_MEMCACHED_START_SCRIPT = "/apps/memcached/bin/memcached";
 	private final String DEFAULT_MEMCACHED_STOP_SCRIPT = "/usr/bin/pkill memcached";
 
-	private List<String> DEFAULT_AVAILABILITY_ZONES = ImmutableList.of();
-	private List<String> DEFAULT_AVAILABILITY_RACKS = ImmutableList.of();
-
 	private final String DEFAULT_DYN_PROCESS_NAME = "dynomite";
 	private final int DEFAULT_DYN_MEMCACHED_PORT = 11211;
-	private final String DEFAULT_DYN_RACK = "RAC1";
 	private final String DEFAULT_TOKENS_DISTRIBUTION = "vnode";
 	private final int DEFAULT_DYNO_REQ_TIMEOUT_IN_MILLISEC = 5000;
 	private final int DEFAULT_DYNO_GOSSIP_INTERVAL = 10000;
@@ -215,11 +219,14 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	private static final Logger logger = LoggerFactory.getLogger(DynomitemanagerConfiguration.class);
 
 	private final String CLUSTER_NAME = System.getenv("NETFLIX_APP");
+	// TODO: ASG SHOULD NOT BE HARDCODED AS WE CAN QUERY IT FROM THE METADATA API
 	private final String AUTO_SCALE_GROUP_NAME = System.getenv("AUTO_SCALE_GROUP");
 	private static final String DEFAULT_INSTANCE_DATA_RETRIEVER = "com.netflix.dynomitemanager.sidecore.config.AwsInstanceDataRetriever";
 	private static final String VPC_INSTANCE_DATA_RETRIEVER = "com.netflix.dynomitemanager.sidecore.config.VpcInstanceDataRetriever";
 
+	// TODO: Get the ASG the AWS API
 	private static String ASG_NAME = System.getenv("ASG_NAME");
+	// TODO: Get the Region from the AWS API
 	private static String REGION = System.getenv("EC2_REGION");
 
 	private final InstanceDataRetriever retriever;
@@ -288,7 +295,8 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	public void initialize() {
 		setupEnvVars();
 		this.configSource.initialize(ASG_NAME, REGION);
-		setDefaultRACList(REGION);
+		// Set the default racks to the list of AZs queried via the AWS SDK
+		setDefaultRacksToAZs(REGION);
 	}
 
 	/**
@@ -364,10 +372,6 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 		}
 	}
 
-	private boolean useAsgForRackName() {
-		return configSource.get(CONFIG_USE_ASG_FOR_RACK_NAME, true);
-	}
-
 	/**
 	 * {@inheritDoc}
 	 * @return {@inheritDoc}
@@ -420,20 +424,29 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 
 	@Override
 	public String getRack() {
-		if (useAsgForRackName()) {
+		final String DEFAULT_DYNOMITE_RACK = "RAC1";
+
+		if (useASGAsRack()) {
 			return getASGName();
 		}
 
-		return configSource.get(CONFIG_RACK_NAME, DEFAULT_DYN_RACK);
+		return configSource.get(CONFIG_DYNOMITE_RACK, DEFAULT_DYNOMITE_RACK);
 	}
 
+	// Determines if the rack name should be set to the ASG name. Set to true when each ASG maps to a single AZ.
+	// This is an AWS specific method.
+	private boolean useASGAsRack() {
+		return configSource.get(CONFIG_DYNOMITE_USE_ASG_AS_RACK, true);
+	}
+
+	/**
+	 * Get the list of statically defined racks (AWS AZs) within this server's data center (AWS Region). The default
+	 * racks start as an empty list and are then populated by {@link #initialize()}.
+	 * @return
+	 */
 	@Override
-	public List<String> getZones() {
-		return configSource.getList(CONFIG_AVAILABILITY_ZONES, DEFAULT_AVAILABILITY_ZONES);
-	}
-
 	public List<String> getRacks() {
-		return configSource.getList(CONFIG_AVAILABILITY_RACKS, DEFAULT_AVAILABILITY_RACKS);
+		return configSource.getList(CONFIG_DYNOMITE_RACKS, DEFAULT_DYNOMITE_RACKS);
 	}
 
 	public String getRegion() {
@@ -448,9 +461,10 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	}
 
 	/**
-	 * Get the fist 3 available zones in the region
+	 * AWS specific method to set the list of racks to the available AZs within this server's Region.
+	 * @param region the AWS Region
 	 */
-	public void setDefaultRACList(String region) {
+	private void setDefaultRacksToAZs(String region) {
 		AmazonEC2 client = new AmazonEC2Client(provider.getAwsCredentialProvider());
 		client.setEndpoint("ec2." + region + ".amazonaws.com");
 		DescribeAvailabilityZonesResult res = client.describeAvailabilityZones();
@@ -462,7 +476,7 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 				break;
 		}
 		//        DEFAULT_AVAILABILITY_ZONES =  StringUtils.join(zone, ",");
-		DEFAULT_AVAILABILITY_ZONES = ImmutableList.copyOf(zone);
+		DEFAULT_DYNOMITE_RACKS = ImmutableList.copyOf(zone);
 	}
 
 	@Override
