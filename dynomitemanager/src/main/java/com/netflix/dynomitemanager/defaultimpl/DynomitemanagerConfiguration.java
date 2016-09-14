@@ -113,7 +113,7 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	private static final String CONFIG_DYNOMITE_RACKS = DM_PREFIX + ".dynomite.racks";
 	private List<String> DEFAULT_DYNOMITE_RACKS = ImmutableList.of();
 
-	private static final String CONFIG_TOKENS_DISTRIBUTION_NAME = DM_PREFIX + ".dyno.tokens.distribution";
+	private static final String CONFIG_DYNOMITE_TOKEN_DISTRIBUTION = DM_PREFIX + ".dynomite.token.distribution";
 	private static final String CONFIG_DYNO_REQ_TIMEOUT_NAME = DM_PREFIX + ".dyno.request.timeout"; // in ms
 	private static final String CONFIG_DYNO_GOSSIP_INTERVAL_NAME = DM_PREFIX + ".dyno.gossip.interval"; // in ms
 	private static final String CONFIG_DYNO_TOKENS_HASH_NAME = DM_PREFIX + ".dyno.tokens.hash";
@@ -185,7 +185,6 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 
 	private final String DEFAULT_DYN_PROCESS_NAME = "dynomite";
 	private final int DEFAULT_DYN_MEMCACHED_PORT = 11211;
-	private final String DEFAULT_TOKENS_DISTRIBUTION = "vnode";
 	private final int DEFAULT_DYNO_REQ_TIMEOUT_IN_MILLISEC = 5000;
 	private final int DEFAULT_DYNO_GOSSIP_INTERVAL = 10000;
 	private final String DEFAULT_DYNO_TOKENS_HASH = "murmur";
@@ -524,9 +523,14 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 		return configSource.get(CONFIG_DYNO_AUTO_EJECT_HOSTS, true);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * @return {@inheritDoc}
+	 */
 	@Override
-	public String getDistribution() {
-		return configSource.get(CONFIG_TOKENS_DISTRIBUTION_NAME, DEFAULT_TOKENS_DISTRIBUTION);
+	public String getTokenDistribution() {
+		final String DEFAULT_DYNOMITE_TOKEN_DISTRIBUTION = "vnode";
+		return configSource.get(CONFIG_DYNOMITE_TOKEN_DISTRIBUTION, DEFAULT_DYNOMITE_TOKEN_DISTRIBUTION);
 	}
 
 	/**

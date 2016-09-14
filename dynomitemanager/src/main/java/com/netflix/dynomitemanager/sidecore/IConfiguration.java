@@ -175,7 +175,20 @@ public interface IConfiguration {
 
 	public boolean getAutoEjectHosts();
 
-	public String getDistribution();
+	/**
+	 * Get the token distribution type, which must be one of:
+	 * <ul>
+	 * <li>vnode (default)
+	 * <li>ketama
+	 * <li>modula
+	 * <li>random
+	 * <li>single
+	 * </ul>
+	 *
+	 * Token distribution type defines how hashed keys (aka tokens) are distributed across Dynomite nodes.
+	 * @return
+	 */
+	public String getTokenDistribution();
 
 	public int getGossipInterval();
 

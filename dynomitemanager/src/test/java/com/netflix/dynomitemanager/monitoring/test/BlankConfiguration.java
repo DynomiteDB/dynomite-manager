@@ -231,7 +231,7 @@ public class BlankConfiguration implements IConfiguration {
 	}
 
 	@Override
-	public String getDistribution() {
+	public String getTokenDistribution() {
 		return null;
 	}
 
