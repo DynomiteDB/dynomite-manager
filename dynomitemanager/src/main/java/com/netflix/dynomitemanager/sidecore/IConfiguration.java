@@ -226,7 +226,12 @@ public interface IConfiguration {
 	 */
 	public int getDataStoreType();
 
-	public boolean isMultiRegionedCluster();
+	/**
+	 * Returns whether or not the Dynomite cluster is configured for multiple data centers (DCs). Returns true when
+	 * configured for multi-DC.
+	 * @return {@link boolean} true if the Dynomite cluster is multi-DC (AWS Regions)
+	 */
+	public boolean isMultiDC();
 
 	public String getSecuredOption();
 

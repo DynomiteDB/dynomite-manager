@@ -92,7 +92,7 @@ public class FloridaServer {
 
     /**
      * Start Dynomite Manager.
-     * 
+     *
      * @throws Exception
      */
     public void initialize() throws Exception {
@@ -104,7 +104,7 @@ public class FloridaServer {
 	state.setSideCarProcessAlive(true);
 	state.setBootstrapStatus(Bootstrap.NOT_STARTED);
 
-	if (config.isMultiRegionedCluster()) {
+	if (config.isMultiDC()) {
 	    scheduler.runTaskNow(UpdateSecuritySettings.class);
 	    if (id.isReplace() || id.isTokenPregenerated()) {
 		long initTime = 100 + (int) (Math.random() * ((200 - 100) + 1));

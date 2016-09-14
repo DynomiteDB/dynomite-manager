@@ -130,7 +130,8 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	// Backend storage type: Redis = 1, Memcached = 0
 	private static final String CONFIG_DYNOMITE_DATA_STORE = DM_PREFIX + ".dynomite.datastore";
 
-	private static final String CONFIG_DYNO_IS_MULTI_REGIONED_CLUSTER = DM_PREFIX + ".dyno.multiregion";
+	// Is the Dynomite cluster running in multiple data centers (DCs) / AWS Regions. true == multi DC
+	private static final String CONFIG_IS_MULTI_DC = DM_PREFIX + ".dyno.multiple.datacenters";
 	private static final String CONFIG_DYNO_HEALTHCHECK_ENABLE = DM_PREFIX + ".dyno.healthcheck.enable";
 	// The max percentage of system memory to be allocated to the Dynomite fronted data store.
 	private static final String CONFIG_DYNO_STORAGE_MEM_PCT_INT = DM_PREFIX + ".dyno.storage.mem.pct.int";
@@ -656,8 +657,12 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 		return configSource.get(CONFIG_DYNOMITE_DATA_STORE, REDIS);
 	}
 
-	public boolean isMultiRegionedCluster() {
-		return configSource.get(CONFIG_DYNO_IS_MULTI_REGIONED_CLUSTER, true);
+	/**
+	 * {@inheritDoc}
+	 * @return {@inheritDoc}
+	 */
+	public boolean isMultiDC() {
+		return configSource.get(CONFIG_IS_MULTI_DC, true);
 	}
 
 	public String getSecuredOption() {

@@ -44,7 +44,7 @@ public class BlankConfiguration implements IConfiguration {
 	}
 
 	@Override
-	public boolean isMultiRegionedCluster() {
+	public boolean isMultiDC() {
 		return false;
 	}
 
