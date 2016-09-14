@@ -23,11 +23,11 @@ public class StorageProxyProvider {
 	private IStorageProxy storageProxy;
 
 	public IStorageProxy getStorageProxy() {
-		if (config.getClusterType() == 0) {  //memcached
+		if (config.getDataStoreType() == 0) {  //memcached
 			if (storageProxy == null) {
 				storageProxy = new MemcachedStorageProxy();
 			}
-		} else if (config.getClusterType() == 1) {
+		} else if (config.getDataStoreType() == 1) {
 			if (storageProxy == null) {
 				storageProxy = new RedisStorageProxy();
 			}

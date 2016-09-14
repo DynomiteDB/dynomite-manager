@@ -126,7 +126,10 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 
 	// Determines if Dynomite preconnects to the backend data store (i.e. Redis(
 	private static final String CONFIG_DYNOMITE_PRECONNECT = DM_PREFIX + ".dynomite.connections.preconnect";
-	private static final String CONFIG_DYNO_CLUSTER_TYPE = DM_PREFIX + ".dyno.cluster.type";
+
+	// Backend storage type: Redis = 1, Memcached = 0
+	private static final String CONFIG_DYNOMITE_DATA_STORE = DM_PREFIX + ".dynomite.datastore";
+
 	private static final String CONFIG_DYNO_IS_MULTI_REGIONED_CLUSTER = DM_PREFIX + ".dyno.multiregion";
 	private static final String CONFIG_DYNO_HEALTHCHECK_ENABLE = DM_PREFIX + ".dyno.healthcheck.enable";
 	// The max percentage of system memory to be allocated to the Dynomite fronted data store.
@@ -193,7 +196,6 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 
 	private final String DEFAULT_DYN_PROCESS_NAME = "dynomite";
 	private final int DEFAULT_DYN_MEMCACHED_PORT = 11211;
-	private final int DEFAULT_DYNO_CLUSTER_TYPE = JedisConfiguration.DYNO_REDIS; //redis
 
 	private final String DEFAULT_METADATA_KEYSPACE = "dyno_bootstrap";
 	private final String DEFAULT_SECURED_OPTION = "datacenter";
@@ -640,11 +642,18 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 		return null;
 	}
 
-	/* 0 - memcached
-	 * 1 - redis
+	/**
+	 * Get the backend storage type.
+	 *
+	 * <ul>
+	 * <li>0: Memcached
+	 * <li>1: Redis
+	 * </ul>
+	 * @return {@link int} 0 for Memcached, 1 for Redis
 	 */
-	public int getClusterType() {
-		return configSource.get(CONFIG_DYNO_CLUSTER_TYPE, DEFAULT_DYNO_CLUSTER_TYPE);
+	@Override
+	public int getDataStoreType() {
+		return configSource.get(CONFIG_DYNOMITE_DATA_STORE, DYNO_REDIS);
 	}
 
 	public boolean isMultiRegionedCluster() {
@@ -700,7 +709,7 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	public String getStorageStartupScript() {
 		final String DEFAULT_REDIS_START_SCRIPT = "/apps/nfredis/bin/launch_nfredis.sh";
 
-		if (getClusterType() == 0)
+		if (getDataStoreType() == 0)
 			return DEFAULT_MEMCACHED_START_SCRIPT;
 
 		return configSource.get(CONFIG_REDIS_START_SCRIPT, DEFAULT_REDIS_START_SCRIPT);
@@ -718,7 +727,7 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	public String getStorageStopScript() {
 		final String DEFAULT_REDIS_STOP_SCRIPT = "/apps/nfredis/bin/kill_redis.sh";
 
-		if (getClusterType() == 0)
+		if (getDataStoreType() == 0)
 			return DEFAULT_MEMCACHED_STOP_SCRIPT;
 
 		return configSource.get(CONFIG_REDIS_STOP_SCRIPT, DEFAULT_REDIS_STOP_SCRIPT);

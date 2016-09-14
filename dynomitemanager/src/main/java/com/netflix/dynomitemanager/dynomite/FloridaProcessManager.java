@@ -208,11 +208,11 @@ public class FloridaProcessManager implements IFloridaProcess {
      * @return true if health check passes and false if it fails.
      */
     public boolean dynomiteCheck() {
-	if (config.getClusterType() == DYNO_MEMCACHED) { // TODO: we need to
+	if (config.getDataStoreType() == DYNO_MEMCACHED) { // TODO: we need to
 							 // implement this once
 							 // we use memcached
 	    logger.error("Dynomite check with Memcached ping is not functional");
-	} else if (config.getClusterType() == DYNO_REDIS) { // use Redis API
+	} else if (config.getDataStoreType() == DYNO_REDIS) { // use Redis API
 	    logger.info("Dynomite check with Redis Ping");
 	    if (!dynomiteRedisCheck()) {
 		try {

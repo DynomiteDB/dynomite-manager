@@ -241,7 +241,7 @@ public class BlankConfiguration implements IConfiguration {
 	}
 
 	@Override
-	public int getClusterType() {
+	public int getDataStoreType() {
 		return 0; //DynomitemanagerConfiguration.DYNO_REDIS;
 	}
 

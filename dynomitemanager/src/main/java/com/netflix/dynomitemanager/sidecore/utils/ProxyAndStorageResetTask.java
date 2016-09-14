@@ -77,11 +77,11 @@ public class ProxyAndStorageResetTask extends Task {
     }
 
     private void dynomiteCheck() {
-	if (config.getClusterType() == DYNO_MEMCACHED) { // TODO: we need to
+	if (config.getDataStoreType() == DYNO_MEMCACHED) { // TODO: we need to
 							 // implement this once
 							 // we use memcached
 	    logger.error("Memcache Dynomite check is not functional");
-	} else if (config.getClusterType() == DYNO_REDIS) { // use Redis API
+	} else if (config.getDataStoreType() == DYNO_REDIS) { // use Redis API
 	    Jedis dynomiteJedis = new Jedis(LOCAL_ADDRESS, DYNO_PORT, 5000);
 	    logger.info("Checking Dynomite's status");
 	    try {

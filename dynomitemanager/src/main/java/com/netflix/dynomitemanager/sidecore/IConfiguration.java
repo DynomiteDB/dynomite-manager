@@ -220,7 +220,11 @@ public interface IConfiguration {
 
 	public String getMetadataKeyspace();
 
-	public int getClusterType();
+	/**
+	 * Get the backend data store type.
+	 * @return {@link int} the backend data store type
+	 */
+	public int getDataStoreType();
 
 	public boolean isMultiRegionedCluster();
 
