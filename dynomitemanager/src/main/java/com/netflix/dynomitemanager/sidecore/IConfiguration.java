@@ -190,6 +190,10 @@ public interface IConfiguration {
 	 */
 	public String getTokenDistribution();
 
+	/**
+	 * Get the length of time in milliseconds between gossip rounds.
+	 * @return {@link int} delay between gossip rounds in milliseconds
+	 */
 	public int getGossipInterval();
 
 	public String getHash();

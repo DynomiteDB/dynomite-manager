@@ -114,10 +114,13 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	private List<String> DEFAULT_DYNOMITE_RACKS = ImmutableList.of();
 
 	private static final String CONFIG_DYNOMITE_TOKEN_DISTRIBUTION = DM_PREFIX + ".dynomite.token.distribution";
-	// in ms
+
+	// Length of time in ms before the timeout
 	private static final String CONFIG_DYNOMITE_REQUEST_TIMEOUT = DM_PREFIX + ".dynomite.request.timeout";
-	// in ms
-	private static final String CONFIG_DYNO_GOSSIP_INTERVAL_NAME = DM_PREFIX + ".dyno.gossip.interval";
+
+	// Delay between gossip rounds in ms
+	private static final String CONFIG_DYNOMITE_GOSSIP_INTERVAL = DM_PREFIX + ".dynomite.gossip.interval";
+
 	private static final String CONFIG_DYNO_TOKENS_HASH_NAME = DM_PREFIX + ".dyno.tokens.hash";
 	private static final String CONFIG_DYNO_CONNECTIONS_PRECONNECT = DM_PREFIX + ".dyno.connections.preconnect";
 	private static final String CONFIG_DYNO_CLUSTER_TYPE = DM_PREFIX + ".dyno.cluster.type";
@@ -187,7 +190,6 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 
 	private final String DEFAULT_DYN_PROCESS_NAME = "dynomite";
 	private final int DEFAULT_DYN_MEMCACHED_PORT = 11211;
-	private final int DEFAULT_DYNO_GOSSIP_INTERVAL = 10000;
 	private final String DEFAULT_DYNO_TOKENS_HASH = "murmur";
 	private final int DEFAULT_DYNO_CLUSTER_TYPE = JedisConfiguration.DYNO_REDIS; //redis
 
@@ -582,9 +584,14 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 		return configSource.get(CONFIG_DYNOMITE_PEER_PORT_SSL, DEFAULT_DYNOMITE_PEER_PORT_SSL);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * @return {@inheritDoc}
+	 */
 	@Override
 	public int getGossipInterval() {
-		return configSource.get(CONFIG_DYNO_GOSSIP_INTERVAL_NAME, DEFAULT_DYNO_GOSSIP_INTERVAL);
+		final int DEFAULT_DYNOMITE_GOSSIP_INTERVAL = 10000;
+		return configSource.get(CONFIG_DYNOMITE_GOSSIP_INTERVAL, DEFAULT_DYNOMITE_GOSSIP_INTERVAL);
 	}
 
 	@Override
