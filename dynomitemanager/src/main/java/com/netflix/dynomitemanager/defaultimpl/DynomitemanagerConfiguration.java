@@ -183,7 +183,10 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	// Name of the Cassandra keyspace that contains the Dynomite cluster topology. If you set this value to anything
 	// other than the default then you must update all scripts in: ./dynomitemanager/src/test/resources/
 	private static final String CONFIG_CASSANDRA_KEYSPACE_NAME = DM_PREFIX + ".cassandra.keyspace.name";
+
+	// Cassandra thrift port used by Astyanax
 	private static final String CONFIG_CASSANDRA_THRIFT_PORT = DM_PREFIX + ".cassandra.thrift.port";
+
 	private static final String CONFIG_COMMA_SEPARATED_CASSANDRA_HOSTNAMES =
 			DM_PREFIX + ".cassandra.comma.separated.hostnames";
 
@@ -270,7 +273,6 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	private final InstanceEnvIdentity insEnvIdentity;
 
 	// Cassandra default configuration
-	private static final int DEFAULT_CASSANDRA_THRIFT_PORT = 9160; //7102;
 	private static final String DEFAULT_COMMA_SEPARATED_CASSANDRA_HOSTNAMES = "127.0.0.1";
 	private static final boolean DEFAULT_IS_EUREKA_HOST_SUPPLIER_ENABLED = true;
 
@@ -930,8 +932,13 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 		return configSource.get(CONFIG_CASSANDRA_KEYSPACE_NAME, DEFAULT_CASSANDRA_KEYSPACE_NAME);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * @return {@inheritDoc}
+	 */
 	@Override
 	public int getCassandraThriftPortForAstyanax() {
+		final int DEFAULT_CASSANDRA_THRIFT_PORT = 9160; //7102;
 		return configSource.get(CONFIG_CASSANDRA_THRIFT_PORT, DEFAULT_CASSANDRA_THRIFT_PORT);
 	}
 

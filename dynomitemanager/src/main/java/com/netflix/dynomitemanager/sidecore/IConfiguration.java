@@ -342,6 +342,10 @@ public interface IConfiguration {
 	 */
 	public String getCassandraKeyspaceName();
 
+	/**
+	 * Get the Cassandra thrift port used by Astyanax.
+	 * @return {@link int} Cassandra thrift port
+	 */
 	public int getCassandraThriftPortForAstyanax();
 
 	public String getCommaSeparatedCassandraHostNames();
