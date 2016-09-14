@@ -131,8 +131,11 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	private static final String CONFIG_DYNOMITE_DATA_STORE = DM_PREFIX + ".dynomite.datastore";
 
 	// Is the Dynomite cluster running in multiple data centers (DCs) / AWS Regions. true == multi DC
-	private static final String CONFIG_IS_MULTI_DC = DM_PREFIX + ".dyno.multiple.datacenters";
-	private static final String CONFIG_DYNO_HEALTHCHECK_ENABLE = DM_PREFIX + ".dyno.healthcheck.enable";
+	private static final String CONFIG_IS_MULTI_DC = DM_PREFIX + ".dynomite.multiple.datacenters";
+
+	// Not used
+//	private static final String CONFIG_DYNOMITE_HEALTHCHECK_ENABLE = DM_PREFIX + ".dynomite.healthcheck.enable";
+
 	// The max percentage of system memory to be allocated to the Dynomite fronted data store.
 	private static final String CONFIG_DYNO_STORAGE_MEM_PCT_INT = DM_PREFIX + ".dyno.storage.mem.pct.int";
 
@@ -669,9 +672,10 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 		return configSource.get(CONFIG_SECURED_OPTION, DEFAULT_SECURED_OPTION);
 	}
 
-	public boolean isHealthCheckEnable() {
-		return configSource.get(CONFIG_DYNO_HEALTHCHECK_ENABLE, true);
-	}
+//	@Override
+//	public boolean isHealthCheckEnable() {
+//		return configSource.get(CONFIG_DYNOMITE_HEALTHCHECK_ENABLE, true);
+//	}
 
 	public boolean isWarmBootstrap() {
 		return configSource.get(CONFIG_DYNO_WARM_BOOTSTRAP, false);

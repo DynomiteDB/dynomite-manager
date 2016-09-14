@@ -48,10 +48,10 @@ public class SimpleTestConfiguration implements IConfiguration {
 		return false;
 	}
 
-	@Override
-	public boolean isHealthCheckEnable() {
-		return false;
-	}
+//	@Override
+//	public boolean isHealthCheckEnable() {
+//		return false;
+//	}
 
 	@Override
 	public boolean isEurekaHostSupplierEnabled() {
