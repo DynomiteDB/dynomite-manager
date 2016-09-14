@@ -124,7 +124,8 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	// Delay between gossip rounds in ms
 	private static final String CONFIG_DYNOMITE_GOSSIP_INTERVAL = DM_PREFIX + ".dynomite.gossip.interval";
 
-	private static final String CONFIG_DYNO_CONNECTIONS_PRECONNECT = DM_PREFIX + ".dyno.connections.preconnect";
+	// Determines if Dynomite preconnects to the backend data store (i.e. Redis(
+	private static final String CONFIG_DYNOMITE_PRECONNECT = DM_PREFIX + ".dynomite.connections.preconnect";
 	private static final String CONFIG_DYNO_CLUSTER_TYPE = DM_PREFIX + ".dyno.cluster.type";
 	private static final String CONFIG_DYNO_IS_MULTI_REGIONED_CLUSTER = DM_PREFIX + ".dyno.multiregion";
 	private static final String CONFIG_DYNO_HEALTHCHECK_ENABLE = DM_PREFIX + ".dyno.healthcheck.enable";
@@ -605,9 +606,13 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 		return configSource.get(CONFIG_DYNOMITE_GOSSIP_INTERVAL, DEFAULT_DYNOMITE_GOSSIP_INTERVAL);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * @return {@inheritDoc}
+	 */
 	@Override
 	public boolean getPreconnect() {
-		return configSource.get(CONFIG_DYNO_CONNECTIONS_PRECONNECT, true);
+		return configSource.get(CONFIG_DYNOMITE_PRECONNECT, true);
 	}
 
 	@Override

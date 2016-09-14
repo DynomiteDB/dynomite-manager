@@ -202,6 +202,10 @@ public interface IConfiguration {
 	 */
 	public int getGossipInterval();
 
+	/**
+	 * Get the connections preconnection setting. If true, then Dynomite will preconnect to the backend data store.
+	 * @return {@link boolean} true if Dynomite should preconnect to the backend data store, false if not
+	 */
 	public boolean getPreconnect();
 
 	public int getServerRetryTimeout();
