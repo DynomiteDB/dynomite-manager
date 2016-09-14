@@ -104,7 +104,7 @@ public class FloridaStandardTuner implements ProcessTuner {
 		entries.put("server_retry_timeout", config.getServerRetryTimeout());
 		entries.put("timeout", config.getRequestTimeout());
 		entries.put("tokens", ii.getTokens());
-		entries.put("secure_server_option", config.getSecuredOption());
+		entries.put("secure_server_option", config.getSecureServerOption());
 		entries.remove("redis");
 		entries.put("datacenter", config.getRegion());
 		entries.put("read_consistency", config.getReadConsistency());

@@ -238,7 +238,19 @@ public interface IConfiguration {
 	 */
 	public boolean isMultiDC();
 
-	public String getSecuredOption();
+	/**
+	 * Get the node-to-node encryption setting for Dynomite. Posssible values are:
+	 * <ul>
+	 * <li>none: Do not encrypt communication between nodes.
+	 * <li>datacenter: Only encrypt communication between nodes that are in different DCs. Communication between
+	 * nodes within the same DC is unencrypted.
+	 * <li>rack: Encrypt communication between nodes in different racks and between nodes across DCs. Do not encrypt
+	 * communication between nodes within the same rack within a DC.
+	 * <li>all: Encrypt all communication between nodes. This is the most secure choice. However, it degrades performance the most.
+	 * </ul>
+	 * @return
+	 */
+	public String getSecureServerOption();
 
 	public boolean isWarmBootstrap();
 

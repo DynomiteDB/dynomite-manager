@@ -133,7 +133,7 @@ public class SimpleTestConfiguration implements IConfiguration {
 	}
 
 	@Override
-	public String getSecuredOption() {
+	public String getSecureServerOption() {
 		return null;
 	}
 

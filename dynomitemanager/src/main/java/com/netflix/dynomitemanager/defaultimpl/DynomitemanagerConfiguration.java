@@ -165,7 +165,9 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	// Never used. Duplicate of: DEFAULT_CASSANDRA_KEYSPACE_NAME
 //	private static final String CONFIG_METADATA_KEYSPACE = DM_PREFIX + ".metadata.keyspace";
 
-	private static final String CONFIG_SECURED_OPTION = DM_PREFIX + ".secured.option";
+	// Encryption option for intra-cluster (i.e. node-to-node) communication: none, rack, all, datacenter (default)
+	private static final String CONFIG_DYNOMITE_CLUSTER_ENCRYPTION = DM_PREFIX + ".dynomite.cluster.encryption";
+
 	private static final String CONFIG_DYNO_AUTO_EJECT_HOSTS = DM_PREFIX + ".auto.eject.hosts";
 
 	// Cassandra
@@ -224,8 +226,6 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	private final String DEFAULT_MEMCACHED_STOP_SCRIPT = "/usr/bin/pkill memcached";
 
 	private final int DEFAULT_DYN_MEMCACHED_PORT = 11211;
-
-	private final String DEFAULT_SECURED_OPTION = "datacenter";
 
 	// Backup & Restore
 	// ----------------
@@ -703,12 +703,19 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	 * {@inheritDoc}
 	 * @return {@inheritDoc}
 	 */
+	@Override
 	public boolean isMultiDC() {
 		return configSource.get(CONFIG_IS_MULTI_DC, true);
 	}
 
-	public String getSecuredOption() {
-		return configSource.get(CONFIG_SECURED_OPTION, DEFAULT_SECURED_OPTION);
+	/**
+	 * {@inheritDoc} TODO: Rename this option in dynomite.yaml to make its purpose clear.
+	 * @return {@inheritDoc}
+	 */
+	@Override
+	public String getSecureServerOption() {
+		final String DEFAULT_DYNOMITE_CLUSTER_ENCRYPTION = "datacenter";
+		return configSource.get(CONFIG_DYNOMITE_CLUSTER_ENCRYPTION, DEFAULT_DYNOMITE_CLUSTER_ENCRYPTION);
 	}
 
 //	@Override

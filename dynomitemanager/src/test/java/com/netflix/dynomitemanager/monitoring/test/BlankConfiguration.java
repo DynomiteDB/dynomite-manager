@@ -133,7 +133,7 @@ public class BlankConfiguration implements IConfiguration {
 	}
 
 	@Override
-	public String getSecuredOption() {
+	public String getSecureServerOption() {
 		return null;
 	}
 
