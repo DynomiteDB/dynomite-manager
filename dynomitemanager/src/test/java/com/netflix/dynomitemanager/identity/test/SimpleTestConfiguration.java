@@ -313,7 +313,7 @@ public class SimpleTestConfiguration implements IConfiguration {
 	}
 
 	@Override
-	public int getAllocatedMessages() {
+	public int getMaxAllocatedMessages() {
 		return 0;
 	}
 

@@ -142,9 +142,12 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	// Not used
 //	private static final String CONFIG_DYNOMITE_HEALTHCHECK_ENABLE = DM_PREFIX + ".dynomite.healthcheck.enable";
 
-	// Size of the memory buffer used to receive each request
+	// Size of the memory buffer used to receive each request. Value is passed to Dynomite via env var and then set
+	// on the CLI via launch_dynomite.sh.
 	private static final String CONFIG_DYNOMITE_MBUF_SIZE = DM_PREFIX + ".dynomite.mbuf.size";
-	private static final String CONFIG_DYNO_MAX_ALLOC_MSGS = DM_PREFIX + ".dyno.allocated.messages";
+
+	// Maximum number of messages that Dynomite will allocate. Value is passed to Dynomite via env var.
+	private static final String CONFIG_DYNOMITE_MAX_ALLOC_MSGS = DM_PREFIX + ".dynomite.allocated.messages.max";
 
 	private static final String CONFIG_DYN_PROCESS_NAME = DM_PREFIX + ".dyno.processname";
 
@@ -759,8 +762,13 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 		return configSource.get(CONFIG_DYNOMITE_MBUF_SIZE, 16384);
 	}
 
-	public int getAllocatedMessages() {
-		return configSource.get(CONFIG_DYNO_MAX_ALLOC_MSGS, 200000);
+	/**
+	 * {@inheritDoc}
+	 * @return {@inheritDoc}
+	 */
+	@Override
+	public int getMaxAllocatedMessages() {
+		return configSource.get(CONFIG_DYNOMITE_MAX_ALLOC_MSGS, 200000);
 	}
 
 	public boolean isVpc() {

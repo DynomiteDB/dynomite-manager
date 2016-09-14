@@ -260,7 +260,11 @@ public interface IConfiguration {
 	 */
 	public int getMbufSize();
 
-	public int getAllocatedMessages();
+	/**
+	 * Maximum number of messages that Dynomite will allocate.
+	 * @return {@link int} maximum number of messages that Dynomite will allocate
+	 */
+	public int getMaxAllocatedMessages();
 
 	// VPC
 	public boolean isVpc();

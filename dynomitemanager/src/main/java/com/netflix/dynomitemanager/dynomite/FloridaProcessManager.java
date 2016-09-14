@@ -60,8 +60,8 @@ public class FloridaProcessManager implements IFloridaProcess {
 
     protected void setEnv(Map<String, String> env) {
 	env.put("MBUF_SIZE", String.valueOf(config.getMbufSize()));
-	if (config.getAllocatedMessages() > 0) {
-	    env.put("ALLOC_MSGS", String.valueOf(config.getAllocatedMessages()));
+	if (config.getMaxAllocatedMessages() > 0) {
+	    env.put("ALLOC_MSGS", String.valueOf(config.getMaxAllocatedMessages()));
 	}
     }
 
