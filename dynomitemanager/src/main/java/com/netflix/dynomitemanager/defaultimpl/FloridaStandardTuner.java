@@ -12,6 +12,9 @@
  */
 package com.netflix.dynomitemanager.defaultimpl;
 
+import static com.netflix.dynomitemanager.defaultimpl.DynomitemanagerConfiguration.REDIS;
+import static com.netflix.dynomitemanager.defaultimpl.DynomitemanagerConfiguration.MEMCACHED;
+
 import com.google.common.base.Charsets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -134,7 +137,7 @@ public class FloridaStandardTuner implements ProcessTuner {
 			servers.clear();
 		}
 
-		if (config.getDataStoreType() == DynomitemanagerConfiguration.DYNO_REDIS) {
+		if (config.getDataStoreType() == REDIS) {
 			entries.put("data_store", 0);
 			servers.add("127.0.0.1:22122:1");
 		} else {
@@ -145,7 +148,7 @@ public class FloridaStandardTuner implements ProcessTuner {
 		if (!this.instanceState.getYmlWritten()) {
 			logger.info("YAML Dump: ");
 			logger.info(yaml.dump(map));
-			if (config.getDataStoreType() == DynomitemanagerConfiguration.DYNO_REDIS) {
+			if (config.getDataStoreType() == REDIS) {
 				updateRedisConfiguration();
 			}
 		} else {
@@ -268,7 +271,7 @@ public class FloridaStandardTuner implements ProcessTuner {
 		storeMaxMem = ((totalMem - storeMaxMem) > GB_2_IN_KB) ? storeMaxMem : (totalMem - GB_2_IN_KB);
 
 		logger.info(String.format("totalMem:%s Setting %s storage max mem to %s", totalMem,
-				config.getDataStoreType() == 1 ? "Redis" : "Memcache", storeMaxMem));
+				config.getDataStoreType() == REDIS ? "Redis" : "Memcache", storeMaxMem));
 		return storeMaxMem;
 	}
 

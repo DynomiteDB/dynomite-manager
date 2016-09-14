@@ -50,8 +50,8 @@ import com.netflix.dynomitemanager.identity.InstanceEnvIdentity;
 public class DynomitemanagerConfiguration implements IConfiguration {
 	public static final String DM_PREFIX = "dm";
 
-	public static final int DYNO_MEMCACHED = 0;
-	public static final int DYNO_REDIS = 1;
+	public static final int MEMCACHED = 0;
+	public static final int REDIS = 1;
 	public static final int DYNO_PORT = 8102;
 	public final static String LOCAL_ADDRESS = "127.0.0.1";
 
@@ -653,7 +653,7 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	 */
 	@Override
 	public int getDataStoreType() {
-		return configSource.get(CONFIG_DYNOMITE_DATA_STORE, DYNO_REDIS);
+		return configSource.get(CONFIG_DYNOMITE_DATA_STORE, REDIS);
 	}
 
 	public boolean isMultiRegionedCluster() {
@@ -709,7 +709,7 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	public String getStorageStartupScript() {
 		final String DEFAULT_REDIS_START_SCRIPT = "/apps/nfredis/bin/launch_nfredis.sh";
 
-		if (getDataStoreType() == 0)
+		if (getDataStoreType() == MEMCACHED)
 			return DEFAULT_MEMCACHED_START_SCRIPT;
 
 		return configSource.get(CONFIG_REDIS_START_SCRIPT, DEFAULT_REDIS_START_SCRIPT);
@@ -727,7 +727,7 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	public String getStorageStopScript() {
 		final String DEFAULT_REDIS_STOP_SCRIPT = "/apps/nfredis/bin/kill_redis.sh";
 
-		if (getDataStoreType() == 0)
+		if (getDataStoreType() == MEMCACHED)
 			return DEFAULT_MEMCACHED_STOP_SCRIPT;
 
 		return configSource.get(CONFIG_REDIS_STOP_SCRIPT, DEFAULT_REDIS_STOP_SCRIPT);

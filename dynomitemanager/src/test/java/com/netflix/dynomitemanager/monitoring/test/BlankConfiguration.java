@@ -8,6 +8,8 @@
  */
 package com.netflix.dynomitemanager.monitoring.test;
 
+import static com.netflix.dynomitemanager.defaultimpl.DynomitemanagerConfiguration.REDIS;
+
 import java.util.List;
 
 import com.netflix.dynomitemanager.sidecore.IConfiguration;
@@ -242,7 +244,7 @@ public class BlankConfiguration implements IConfiguration {
 
 	@Override
 	public int getDataStoreType() {
-		return 0; //DynomitemanagerConfiguration.DYNO_REDIS;
+		return REDIS;
 	}
 
 	@Override

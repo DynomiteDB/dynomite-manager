@@ -15,8 +15,8 @@ package com.netflix.dynomitemanager.sidecore.utils;
 import com.netflix.dynomitemanager.dynomite.IFloridaProcess;
 
 import static com.netflix.dynomitemanager.defaultimpl.DynomitemanagerConfiguration.LOCAL_ADDRESS;
-import static com.netflix.dynomitemanager.defaultimpl.DynomitemanagerConfiguration.DYNO_MEMCACHED;
-import static com.netflix.dynomitemanager.defaultimpl.DynomitemanagerConfiguration.DYNO_REDIS;
+import static com.netflix.dynomitemanager.defaultimpl.DynomitemanagerConfiguration.MEMCACHED;
+import static com.netflix.dynomitemanager.defaultimpl.DynomitemanagerConfiguration.REDIS;
 import static com.netflix.dynomitemanager.defaultimpl.DynomitemanagerConfiguration.DYNO_PORT;
 
 import java.io.IOException;
@@ -77,11 +77,9 @@ public class ProxyAndStorageResetTask extends Task {
     }
 
     private void dynomiteCheck() {
-	if (config.getDataStoreType() == DYNO_MEMCACHED) { // TODO: we need to
-							 // implement this once
-							 // we use memcached
+	if (config.getDataStoreType() == MEMCACHED) { // TODO: we need to implement this once we use memcached
 	    logger.error("Memcache Dynomite check is not functional");
-	} else if (config.getDataStoreType() == DYNO_REDIS) { // use Redis API
+	} else if (config.getDataStoreType() == REDIS) { // use Redis API
 	    Jedis dynomiteJedis = new Jedis(LOCAL_ADDRESS, DYNO_PORT, 5000);
 	    logger.info("Checking Dynomite's status");
 	    try {

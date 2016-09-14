@@ -16,8 +16,6 @@ package com.netflix.dynomitemanager.defaultimpl;
  * Configure the Jedis client for Redis.
  */
 public class JedisConfiguration {
-	public static final int DYNO_MEMCACHED = 0;
-	public static final int DYNO_REDIS = 1;
 	public static final int DYNO_PORT = 8102;
 	public static final String REDIS_ADDRESS = "127.0.0.1";
 	public static final int REDIS_PORT = 22122;

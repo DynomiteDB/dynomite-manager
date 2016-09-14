@@ -12,6 +12,9 @@
  */
 package com.netflix.dynomitemanager.sidecore.storage;
 
+import static com.netflix.dynomitemanager.defaultimpl.DynomitemanagerConfiguration.REDIS;
+import static com.netflix.dynomitemanager.defaultimpl.DynomitemanagerConfiguration.MEMCACHED;
+
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.netflix.dynomitemanager.sidecore.IConfiguration;
@@ -23,11 +26,11 @@ public class StorageProxyProvider {
 	private IStorageProxy storageProxy;
 
 	public IStorageProxy getStorageProxy() {
-		if (config.getDataStoreType() == 0) {  //memcached
+		if (config.getDataStoreType() == MEMCACHED) {
 			if (storageProxy == null) {
 				storageProxy = new MemcachedStorageProxy();
 			}
-		} else if (config.getDataStoreType() == 1) {
+		} else if (config.getDataStoreType() == REDIS) {
 			if (storageProxy == null) {
 				storageProxy = new RedisStorageProxy();
 			}

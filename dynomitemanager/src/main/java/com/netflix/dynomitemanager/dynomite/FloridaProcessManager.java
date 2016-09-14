@@ -12,9 +12,9 @@
  */
 package com.netflix.dynomitemanager.dynomite;
 
-import static com.netflix.dynomitemanager.defaultimpl.DynomitemanagerConfiguration.DYNO_MEMCACHED;
+import static com.netflix.dynomitemanager.defaultimpl.DynomitemanagerConfiguration.REDIS;
+import static com.netflix.dynomitemanager.defaultimpl.DynomitemanagerConfiguration.MEMCACHED;
 import static com.netflix.dynomitemanager.defaultimpl.DynomitemanagerConfiguration.DYNO_PORT;
-import static com.netflix.dynomitemanager.defaultimpl.DynomitemanagerConfiguration.DYNO_REDIS;
 import static com.netflix.dynomitemanager.defaultimpl.DynomitemanagerConfiguration.LOCAL_ADDRESS;
 
 import com.google.common.collect.Lists;
@@ -208,11 +208,9 @@ public class FloridaProcessManager implements IFloridaProcess {
      * @return true if health check passes and false if it fails.
      */
     public boolean dynomiteCheck() {
-	if (config.getDataStoreType() == DYNO_MEMCACHED) { // TODO: we need to
-							 // implement this once
-							 // we use memcached
+	if (config.getDataStoreType() == MEMCACHED) { // TODO: we need to implement this once we use memcached
 	    logger.error("Dynomite check with Memcached ping is not functional");
-	} else if (config.getDataStoreType() == DYNO_REDIS) { // use Redis API
+	} else if (config.getDataStoreType() == REDIS) { // use Redis API
 	    logger.info("Dynomite check with Redis Ping");
 	    if (!dynomiteRedisCheck()) {
 		try {
