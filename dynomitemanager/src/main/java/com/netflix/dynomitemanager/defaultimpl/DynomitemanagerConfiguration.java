@@ -81,6 +81,12 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	private static final String CONFIG_REDIS_AOF_FILENAME = DM_PREFIX + ".redis.aof.filename";
 	private static final String CONFIG_REDIS_RDB_FILENAME = DM_PREFIX + ".redis.rdb.filename";
 
+	// Backend storage (data store) - General
+	// ======================================
+
+	// {int} The maximum percent of system memory allocated to the backend data store.
+	private static final String CONFIG_STORAGE_MAX_MEMORY_PERCENT = DM_PREFIX + ".storage.memory.percent";
+
 	// Dynomite
 	// ========
 
@@ -135,9 +141,6 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 
 	// Not used
 //	private static final String CONFIG_DYNOMITE_HEALTHCHECK_ENABLE = DM_PREFIX + ".dynomite.healthcheck.enable";
-
-	// The max percentage of system memory to be allocated to the Dynomite fronted data store.
-	private static final String CONFIG_DYNO_STORAGE_MEM_PCT_INT = DM_PREFIX + ".dyno.storage.mem.pct.int";
 
 	private static final String CONFIG_DYNO_MBUF_SIZE = DM_PREFIX + ".dyno.mbuf.size";
 	private static final String CONFIG_DYNO_MAX_ALLOC_MSGS = DM_PREFIX + ".dyno.allocated.messages";
@@ -701,9 +704,13 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 		return configSource.get(CONFIG_DYNO_WRITE_CONS, "DC_ONE");
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * @return {@inheritDoc}
+	 */
 	@Override
-	public int getStorageMemPercent() {
-		return configSource.get(CONFIG_DYNO_STORAGE_MEM_PCT_INT, 85);
+	public int getStorageMaxMemoryPercent() {
+		return configSource.get(CONFIG_STORAGE_MAX_MEMORY_PERCENT, 85);
 	}
 
 	/**

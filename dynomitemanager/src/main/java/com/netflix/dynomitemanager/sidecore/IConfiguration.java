@@ -246,7 +246,12 @@ public interface IConfiguration {
 	public int getMaxTimeToBootstrap();
 
 	/** The max percentage of system memory to be allocated to the Dynomite fronted data store. */
-	public int getStorageMemPercent();
+	/**
+	 * Get the maximum percent of system memory allocated to the backend data store represented as an integer. For
+	 * example, 85% should be written as 85.
+	 * @return {@link int} maximum percent of system memory allocated to the backend data store
+	 */
+	public int getStorageMaxMemoryPercent();
 
 	public int getMbufSize();
 

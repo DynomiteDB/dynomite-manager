@@ -13,7 +13,6 @@
 package com.netflix.dynomitemanager.defaultimpl;
 
 import static com.netflix.dynomitemanager.defaultimpl.DynomitemanagerConfiguration.REDIS;
-import static com.netflix.dynomitemanager.defaultimpl.DynomitemanagerConfiguration.MEMCACHED;
 
 import com.google.common.base.Charsets;
 import com.google.inject.Inject;
@@ -264,7 +263,7 @@ public class FloridaStandardTuner implements ProcessTuner {
 	 * @return the maximum amount of storage available for Redis or Memcached in KB
 	 */
 	private long getStoreMaxMem() {
-		int memPct = config.getStorageMemPercent();
+		int memPct = config.getStorageMaxMemoryPercent();
 		// Long is big enough for the amount of ram is all practical systems that we deal with.
 		long totalMem = getTotalAvailableSystemMemory();
 		long storeMaxMem = (totalMem * memPct) / 100;
