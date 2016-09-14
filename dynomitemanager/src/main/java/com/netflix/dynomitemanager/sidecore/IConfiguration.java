@@ -219,7 +219,11 @@ public interface IConfiguration {
 
 	public String getTokens();
 
-	public String getMetadataKeyspace();
+	/**
+	 * NEVER USED
+	 * @return
+	 */
+//	public String getMetadataKeyspace();
 
 	/**
 	 * Get the backend data store type.
@@ -314,7 +318,10 @@ public interface IConfiguration {
 
 	public boolean isAof();
 
-	// Cassandra
+	/**
+	 * Get the name of the Cassandra keyspace that contains the Dynomite cluster topology.
+	 * @return {@link String} name of the Cassandra keyspace used to store the Dynomite cluster topology
+	 */
 	public String getCassandraKeyspaceName();
 
 	public int getCassandraThriftPortForAstyanax();

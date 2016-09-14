@@ -145,7 +145,7 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	// Is the Dynomite cluster running in multiple data centers (DCs) / AWS Regions. true == multi DC
 	private static final String CONFIG_IS_MULTI_DC = DM_PREFIX + ".dynomite.multiple.datacenters";
 
-	// Not used
+	// Never used
 //	private static final String CONFIG_DYNOMITE_HEALTHCHECK_ENABLE = DM_PREFIX + ".dynomite.healthcheck.enable";
 
 	// Size of the memory buffer used to receive each request. Value is passed to Dynomite via env var and then set
@@ -162,12 +162,22 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	// Full path to the dynomite.yaml file
 	private static final String CONFIG_DYNOMITE_YAML = DM_PREFIX + ".dynomite.yaml";
 
-	private static final String CONFIG_METADATA_KEYSPACE = DM_PREFIX + ".metadata.keyspace";
+	// Never used. Duplicate of: DEFAULT_CASSANDRA_KEYSPACE_NAME
+//	private static final String CONFIG_METADATA_KEYSPACE = DM_PREFIX + ".metadata.keyspace";
+
 	private static final String CONFIG_SECURED_OPTION = DM_PREFIX + ".secured.option";
 	private static final String CONFIG_DYNO_AUTO_EJECT_HOSTS = DM_PREFIX + ".auto.eject.hosts";
 
+	// Cassandra
+	// =========
+	//
+	// Cassandra is used to store the Dynomite cluster topology.
+
 	// Cassandra Cluster for token management
 	private static final String CONFIG_BOOTCLUSTER_NAME = DM_PREFIX + ".bootcluster";
+
+	// Name of the Cassandra keyspace that contains the Dynomite cluster topology. If you set this value to anything
+	// other than the default then you must update all scripts in: ./dynomitemanager/src/test/resources/
 	private static final String CONFIG_CASSANDRA_KEYSPACE_NAME = DM_PREFIX + ".cassandra.keyspace.name";
 	private static final String CONFIG_CASSANDRA_THRIFT_PORT = DM_PREFIX + ".cassandra.thrift.port";
 	private static final String CONFIG_COMMA_SEPARATED_CASSANDRA_HOSTNAMES =
@@ -215,7 +225,6 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 
 	private final int DEFAULT_DYN_MEMCACHED_PORT = 11211;
 
-	private final String DEFAULT_METADATA_KEYSPACE = "dyno_bootstrap";
 	private final String DEFAULT_SECURED_OPTION = "datacenter";
 
 	// Backup & Restore
@@ -261,7 +270,6 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	// Cassandra default configuration
 	private static final String DEFAULT_BOOTCLUSTER_NAME = "cass_dyno";
 	private static final int DEFAULT_CASSANDRA_THRIFT_PORT = 9160; //7102;
-	private static final String DEFAULT_CASSANDRA_KEYSPACE_NAME = "dyno_bootstrap";
 	private static final String DEFAULT_COMMA_SEPARATED_CASSANDRA_HOSTNAMES = "127.0.0.1";
 	private static final boolean DEFAULT_IS_EUREKA_HOST_SUPPLIER_ENABLED = true;
 
@@ -661,9 +669,15 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 		return configSource.get(CONFIG_DYNOMITE_REQUEST_TIMEOUT, DEFAULT_DYNOMITE_REQUEST_TIMEOUT);
 	}
 
-	public String getMetadataKeyspace() {
-		return configSource.get(CONFIG_METADATA_KEYSPACE, DEFAULT_METADATA_KEYSPACE);
-	}
+	/**
+	 * {@inheritDoc}
+	 * @return {@inheritDoc}
+	 */
+//	@Override
+//	public String getMetadataKeyspace() {
+//		final String DEFAULT_METADATA_KEYSPACE = "dyno_bootstrap";
+//		return configSource.get(CONFIG_METADATA_KEYSPACE, DEFAULT_METADATA_KEYSPACE);
+//	}
 
 	@Override
 	public String getTokens() {
@@ -884,9 +898,14 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 		return configSource.get(CONFIG_DUAL_ACCOUNT, DEFAULT_DUAL_ACCOUNT);
 	}
 
-	// Cassandra configuration for token management
+	/**
+	 * {@inheritDoc}
+	 * @return {@inheritDoc}
+	 */
 	@Override
 	public String getCassandraKeyspaceName() {
+		final String DEFAULT_CASSANDRA_KEYSPACE_NAME = CONFIG_PACKAGE.equals("dynomitedb")
+				? "dynomite_bootstrap" : "dyno_bootstrap";
 		return configSource.get(CONFIG_CASSANDRA_KEYSPACE_NAME, DEFAULT_CASSANDRA_KEYSPACE_NAME);
 	}
 

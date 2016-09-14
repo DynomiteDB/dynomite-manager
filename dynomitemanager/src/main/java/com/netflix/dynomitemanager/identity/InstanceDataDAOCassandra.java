@@ -63,7 +63,7 @@ public class InstanceDataDAOCassandra {
 	private final IConfiguration config;
 	private final HostSupplier hostSupplier;
 	private final String BOOT_CLUSTER;
-	private final String KS_NAME;
+	private final String KEYSPACE;
 	private final int thriftPortForAstyanax;
 	private final AstyanaxContext<Keyspace> ctx;
 
@@ -94,9 +94,9 @@ public class InstanceDataDAOCassandra {
 			throw new RuntimeException(
 					"BootCluster can not be blank. Please use getBootClusterName() property.");
 
-		KS_NAME = config.getCassandraKeyspaceName();
+		KEYSPACE = config.getCassandraKeyspaceName();
 
-		if (KS_NAME == null || KS_NAME.isEmpty())
+		if (KEYSPACE == null || KEYSPACE.isEmpty())
 			throw new RuntimeException(
 					"Cassandra Keyspace can not be blank. Please use getCassandraKeyspaceName() property.");
 
@@ -267,7 +267,7 @@ public class InstanceDataDAOCassandra {
 			logger.debug(selectClause);
 
 			final ColumnFamily<String, String> CF_TOKENS_NEW = ColumnFamily
-					.newColumnFamily(KS_NAME, StringSerializer.get(), StringSerializer.get());
+					.newColumnFamily(KEYSPACE, StringSerializer.get(), StringSerializer.get());
 
 			OperationResult<CqlResult<String, String>> result = bootKeyspace.prepareQuery(CF_TOKENS_NEW)
 					.withCql(selectClause).execute();
@@ -290,7 +290,7 @@ public class InstanceDataDAOCassandra {
 			logger.info(selectClause);
 
 			final ColumnFamily<String, String> CF_INSTANCES_NEW = ColumnFamily
-					.newColumnFamily(KS_NAME, StringSerializer.get(), StringSerializer.get());
+					.newColumnFamily(KEYSPACE, StringSerializer.get(), StringSerializer.get());
 
 			OperationResult<CqlResult<String, String>> result = bootKeyspace.prepareQuery(CF_INSTANCES_NEW)
 					.withCql(selectClause).execute();
@@ -345,8 +345,8 @@ public class InstanceDataDAOCassandra {
 
 	private AstyanaxContext<Keyspace> initWithThriftDriverWithEurekaHostsSupplier() {
 
-		logger.info("BOOT_CLUSTER = {}, KS_NAME = {}", BOOT_CLUSTER, KS_NAME);
-		return new AstyanaxContext.Builder().forCluster(BOOT_CLUSTER).forKeyspace(KS_NAME)
+		logger.info("BOOT_CLUSTER = {}, KEYSPACE = {}", BOOT_CLUSTER, KEYSPACE);
+		return new AstyanaxContext.Builder().forCluster(BOOT_CLUSTER).forKeyspace(KEYSPACE)
 				.withAstyanaxConfiguration(new AstyanaxConfigurationImpl()
 						.setDiscoveryType(NodeDiscoveryType.DISCOVERY_SERVICE))
 				.withConnectionPoolConfiguration(new ConnectionPoolConfigurationImpl("MyConnectionPool")
@@ -359,8 +359,8 @@ public class InstanceDataDAOCassandra {
 
 	private AstyanaxContext<Keyspace> initWithThriftDriverWithExternalHostsSupplier() {
 
-		logger.info("BOOT_CLUSTER = {}, KS_NAME = {}", BOOT_CLUSTER, KS_NAME);
-		return new AstyanaxContext.Builder().forCluster(BOOT_CLUSTER).forKeyspace(KS_NAME)
+		logger.info("BOOT_CLUSTER = {}, KEYSPACE = {}", BOOT_CLUSTER, KEYSPACE);
+		return new AstyanaxContext.Builder().forCluster(BOOT_CLUSTER).forKeyspace(KEYSPACE)
 				.withAstyanaxConfiguration(new AstyanaxConfigurationImpl()
 						.setDiscoveryType(NodeDiscoveryType.DISCOVERY_SERVICE)
 						.setConnectionPoolType(ConnectionPoolType.ROUND_ROBIN))
