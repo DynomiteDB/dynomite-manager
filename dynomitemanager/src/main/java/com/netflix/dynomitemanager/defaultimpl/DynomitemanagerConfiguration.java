@@ -549,7 +549,8 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	 */
 	@Override
 	public String getDynomiteYaml() {
-		final String DEFAULT_DYNOMITE_YAML = "/apps/dynomite/conf/dynomite.yml";
+		final String DEFAULT_DYNOMITE_YAML = CONFIG_PACKAGE.equals("dynomitedb")
+				? "/etc/dynomitedb/dynomite.yaml" : "/apps/dynomite/conf/dynomite.yml";
 		return configSource.get(CONFIG_DYNOMITE_YAML, DEFAULT_DYNOMITE_YAML);
 	}
 
