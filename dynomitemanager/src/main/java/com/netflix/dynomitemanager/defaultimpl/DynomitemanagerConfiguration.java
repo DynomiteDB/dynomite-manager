@@ -187,8 +187,8 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	// Cassandra thrift port used by Astyanax
 	private static final String CONFIG_CASSANDRA_THRIFT_PORT = DM_PREFIX + ".cassandra.thrift.port";
 
-	private static final String CONFIG_COMMA_SEPARATED_CASSANDRA_HOSTNAMES =
-			DM_PREFIX + ".cassandra.comma.separated.hostnames";
+	// Comma separated list of Cassandra hostnames
+	private static final String CONFIG_CASSANDRA_HOSTNAMES = DM_PREFIX + ".cassandra.hostnames";
 
 	// Eureka
 	// ======
@@ -273,7 +273,6 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	private final InstanceEnvIdentity insEnvIdentity;
 
 	// Cassandra default configuration
-	private static final String DEFAULT_COMMA_SEPARATED_CASSANDRA_HOSTNAMES = "127.0.0.1";
 	private static final boolean DEFAULT_IS_EUREKA_HOST_SUPPLIER_ENABLED = true;
 
 	//= instance identity meta data
@@ -942,10 +941,14 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 		return configSource.get(CONFIG_CASSANDRA_THRIFT_PORT, DEFAULT_CASSANDRA_THRIFT_PORT);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * @return {@inheritDoc}
+	 */
 	@Override
-	public String getCommaSeparatedCassandraHostNames() {
-		return configSource.get(CONFIG_COMMA_SEPARATED_CASSANDRA_HOSTNAMES,
-				DEFAULT_COMMA_SEPARATED_CASSANDRA_HOSTNAMES);
+	public String getCassandraHostnames() {
+		final String DEFAULT_CASSANDRA_HOSTNAMES = "127.0.0.1";
+		return configSource.get(CONFIG_CASSANDRA_HOSTNAMES, DEFAULT_CASSANDRA_HOSTNAMES);
 	}
 
 	@Override

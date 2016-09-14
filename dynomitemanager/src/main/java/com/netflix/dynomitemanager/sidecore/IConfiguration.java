@@ -348,7 +348,11 @@ public interface IConfiguration {
 	 */
 	public int getCassandraThriftPortForAstyanax();
 
-	public String getCommaSeparatedCassandraHostNames();
+	/**
+	 * Get a comma separated list of Cassandra hostnames that contain the Dynomite cluster topology.
+	 * @return {@link String} a comma separated list of Cassandra hostnames
+	 */
+	public String getCassandraHostnames();
 
 	public boolean isEurekaHostSupplierEnabled();
 

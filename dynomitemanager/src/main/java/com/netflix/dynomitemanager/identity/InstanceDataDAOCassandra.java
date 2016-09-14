@@ -373,23 +373,20 @@ public class InstanceDataDAOCassandra {
 	}
 
 	private Supplier<List<Host>> getSupplier() {
-
 		return new Supplier<List<Host>>() {
-
 			@Override
 			public List<Host> get() {
-
 				List<Host> hosts = new ArrayList<Host>();
 
 				List<String> cassHostnames = new ArrayList<String>(Arrays.asList(StringUtils
-						.split(config.getCommaSeparatedCassandraHostNames(), ",")));
+						.split(config.getCassandraHostnames(), ",")));
 
 				if (cassHostnames.size() == 0)
 					throw new RuntimeException(
-							"Cassandra Host Names can not be blank. At least one host is needed. Please use getCommaSeparatedCassandraHostNames() property.");
+							"Cassandra hostnames cannot be blank. At least one host is required.");
 
 				for (String cassHost : cassHostnames) {
-					logger.info("Adding Cassandra Host = {}", cassHost);
+					logger.info("Adding Cassandra host = {}", cassHost);
 					hosts.add(new Host(cassHost, thriftPortForAstyanax));
 				}
 
