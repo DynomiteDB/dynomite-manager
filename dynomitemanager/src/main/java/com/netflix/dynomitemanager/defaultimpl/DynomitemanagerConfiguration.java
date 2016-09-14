@@ -142,7 +142,8 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	// Not used
 //	private static final String CONFIG_DYNOMITE_HEALTHCHECK_ENABLE = DM_PREFIX + ".dynomite.healthcheck.enable";
 
-	private static final String CONFIG_DYNO_MBUF_SIZE = DM_PREFIX + ".dyno.mbuf.size";
+	// Size of the memory buffer used to receive each request
+	private static final String CONFIG_DYNOMITE_MBUF_SIZE = DM_PREFIX + ".dynomite.mbuf.size";
 	private static final String CONFIG_DYNO_MAX_ALLOC_MSGS = DM_PREFIX + ".dyno.allocated.messages";
 
 	private static final String CONFIG_DYN_PROCESS_NAME = DM_PREFIX + ".dyno.processname";
@@ -749,8 +750,13 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 		return configSource.get(CONFIG_REDIS_STOP_SCRIPT, DEFAULT_REDIS_STOP_SCRIPT);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * @return {@inheritDoc}
+	 */
+	@Override
 	public int getMbufSize() {
-		return configSource.get(CONFIG_DYNO_MBUF_SIZE, 16384);
+		return configSource.get(CONFIG_DYNOMITE_MBUF_SIZE, 16384);
 	}
 
 	public int getAllocatedMessages() {

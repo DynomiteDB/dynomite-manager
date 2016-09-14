@@ -253,6 +253,11 @@ public interface IConfiguration {
 	 */
 	public int getStorageMaxMemoryPercent();
 
+	/**
+	 * Get the size of the mbuf used by Dynomite. Set a smaller mbuf size whenever possible to conserve resources.
+	 * An overly large mbuf will cause Dynomite to use more memory buffer space on each request than is necessary.
+	 * @return {@link int} Dynomite mbuf size
+	 */
 	public int getMbufSize();
 
 	public int getAllocatedMessages();
