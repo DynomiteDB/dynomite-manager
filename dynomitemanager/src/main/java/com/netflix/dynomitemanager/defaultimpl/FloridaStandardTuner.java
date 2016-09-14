@@ -92,11 +92,11 @@ public class FloridaStandardTuner implements ProcessTuner {
 
 		entries.put("auto_eject_hosts", config.getAutoEjectHosts());
 		entries.put("rack", config.getRack());
-		entries.put("distribution", config.getTokenDistribution());
+		entries.put("distribution", config.getTokensDistribution());
 		entries.put("dyn_listen", config.getPeerListenAddress());
 		entries.put("dyn_seed_provider", config.getSeedProvider());
 		entries.put("gos_interval", config.getGossipInterval());
-		entries.put("hash", config.getHash());
+		entries.put("hash", config.getTokensHash());
 		entries.put("listen", config.getClientListenAddress());
 		entries.put("preconnect", config.getPreconnect());
 		entries.put("server_retry_timeout", config.getServerRetryTimeout());

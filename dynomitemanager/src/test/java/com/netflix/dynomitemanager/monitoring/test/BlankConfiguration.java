@@ -216,7 +216,7 @@ public class BlankConfiguration implements IConfiguration {
 	}
 
 	@Override
-	public String getHash() {
+	public String getTokensHash() {
 		return null;
 	}
 
@@ -231,7 +231,7 @@ public class BlankConfiguration implements IConfiguration {
 	}
 
 	@Override
-	public String getTokenDistribution() {
+	public String getTokensDistribution() {
 		return null;
 	}
 

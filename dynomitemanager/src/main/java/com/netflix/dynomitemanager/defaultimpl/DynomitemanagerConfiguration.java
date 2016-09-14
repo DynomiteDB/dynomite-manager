@@ -113,7 +113,10 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	private static final String CONFIG_DYNOMITE_RACKS = DM_PREFIX + ".dynomite.racks";
 	private List<String> DEFAULT_DYNOMITE_RACKS = ImmutableList.of();
 
-	private static final String CONFIG_DYNOMITE_TOKEN_DISTRIBUTION = DM_PREFIX + ".dynomite.token.distribution";
+	// Tokens distribution type (i.e. how are tokens distributed around the cluster) and hash (i.e. which hashing
+	// algorithm to use).
+	private static final String CONFIG_DYNOMITE_TOKENS_DISTRIBUTION = DM_PREFIX + ".dynomite.tokens.distribution";
+	private static final String CONFIG_DYNOMITE_TOKENS_HASH = DM_PREFIX + ".dynomite.tokens.hash";
 
 	// Length of time in ms before the timeout
 	private static final String CONFIG_DYNOMITE_REQUEST_TIMEOUT = DM_PREFIX + ".dynomite.request.timeout";
@@ -121,7 +124,6 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	// Delay between gossip rounds in ms
 	private static final String CONFIG_DYNOMITE_GOSSIP_INTERVAL = DM_PREFIX + ".dynomite.gossip.interval";
 
-	private static final String CONFIG_DYNO_TOKENS_HASH_NAME = DM_PREFIX + ".dyno.tokens.hash";
 	private static final String CONFIG_DYNO_CONNECTIONS_PRECONNECT = DM_PREFIX + ".dyno.connections.preconnect";
 	private static final String CONFIG_DYNO_CLUSTER_TYPE = DM_PREFIX + ".dyno.cluster.type";
 	private static final String CONFIG_DYNO_IS_MULTI_REGIONED_CLUSTER = DM_PREFIX + ".dyno.multiregion";
@@ -190,7 +192,6 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 
 	private final String DEFAULT_DYN_PROCESS_NAME = "dynomite";
 	private final int DEFAULT_DYN_MEMCACHED_PORT = 11211;
-	private final String DEFAULT_DYNO_TOKENS_HASH = "murmur";
 	private final int DEFAULT_DYNO_CLUSTER_TYPE = JedisConfiguration.DYNO_REDIS; //redis
 
 	private final String DEFAULT_METADATA_KEYSPACE = "dyno_bootstrap";
@@ -531,9 +532,19 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	 * @return {@inheritDoc}
 	 */
 	@Override
-	public String getTokenDistribution() {
-		final String DEFAULT_DYNOMITE_TOKEN_DISTRIBUTION = "vnode";
-		return configSource.get(CONFIG_DYNOMITE_TOKEN_DISTRIBUTION, DEFAULT_DYNOMITE_TOKEN_DISTRIBUTION);
+	public String getTokensDistribution() {
+		final String DEFAULT_DYNOMITE_TOKENS_DISTRIBUTION = "vnode";
+		return configSource.get(CONFIG_DYNOMITE_TOKENS_DISTRIBUTION, DEFAULT_DYNOMITE_TOKENS_DISTRIBUTION);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @return {@inheritDoc}
+	 */
+	@Override
+	public String getTokensHash() {
+		final String DEFAULT_DYNOMITE_TOKENS_HASH = "murmur";
+		return configSource.get(CONFIG_DYNOMITE_TOKENS_HASH, DEFAULT_DYNOMITE_TOKENS_HASH);
 	}
 
 	/**
@@ -592,11 +603,6 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	public int getGossipInterval() {
 		final int DEFAULT_DYNOMITE_GOSSIP_INTERVAL = 10000;
 		return configSource.get(CONFIG_DYNOMITE_GOSSIP_INTERVAL, DEFAULT_DYNOMITE_GOSSIP_INTERVAL);
-	}
-
-	@Override
-	public String getHash() {
-		return configSource.get(CONFIG_DYNO_TOKENS_HASH_NAME, DEFAULT_DYNO_TOKENS_HASH);
 	}
 
 	@Override

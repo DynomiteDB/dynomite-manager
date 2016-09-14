@@ -188,15 +188,19 @@ public interface IConfiguration {
 	 * Token distribution type defines how hashed keys (aka tokens) are distributed across Dynomite nodes.
 	 * @return
 	 */
-	public String getTokenDistribution();
+	public String getTokensDistribution();
+
+	/**
+	 * Get the hashing algorithm that is used to generate a token.
+	 * @return {@link String} the name of the hashing algorithm used to generate a token
+	 */
+	public String getTokensHash();
 
 	/**
 	 * Get the length of time in milliseconds between gossip rounds.
 	 * @return {@link int} delay between gossip rounds in milliseconds
 	 */
 	public int getGossipInterval();
-
-	public String getHash();
 
 	public boolean getPreconnect();
 
