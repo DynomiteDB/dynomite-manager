@@ -96,7 +96,7 @@ public class SimpleTestConfiguration implements IConfiguration {
 	}
 
 	@Override
-	public int getTimeout() {
+	public int getRequestTimeout() {
 		return 0;
 	}
 

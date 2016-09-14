@@ -198,7 +198,11 @@ public interface IConfiguration {
 
 	public int getServerRetryTimeout();
 
-	public int getTimeout();
+	/**
+	 * Get the request timeout in milliseconds.
+	 * @return {@link int} request timeout in milliseconds
+	 */
+	public int getRequestTimeout();
 
 	public String getTokens();
 

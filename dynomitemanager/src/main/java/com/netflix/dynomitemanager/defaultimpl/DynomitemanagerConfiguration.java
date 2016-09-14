@@ -114,8 +114,10 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 	private List<String> DEFAULT_DYNOMITE_RACKS = ImmutableList.of();
 
 	private static final String CONFIG_DYNOMITE_TOKEN_DISTRIBUTION = DM_PREFIX + ".dynomite.token.distribution";
-	private static final String CONFIG_DYNO_REQ_TIMEOUT_NAME = DM_PREFIX + ".dyno.request.timeout"; // in ms
-	private static final String CONFIG_DYNO_GOSSIP_INTERVAL_NAME = DM_PREFIX + ".dyno.gossip.interval"; // in ms
+	// in ms
+	private static final String CONFIG_DYNOMITE_REQUEST_TIMEOUT = DM_PREFIX + ".dynomite.request.timeout";
+	// in ms
+	private static final String CONFIG_DYNO_GOSSIP_INTERVAL_NAME = DM_PREFIX + ".dyno.gossip.interval";
 	private static final String CONFIG_DYNO_TOKENS_HASH_NAME = DM_PREFIX + ".dyno.tokens.hash";
 	private static final String CONFIG_DYNO_CONNECTIONS_PRECONNECT = DM_PREFIX + ".dyno.connections.preconnect";
 	private static final String CONFIG_DYNO_CLUSTER_TYPE = DM_PREFIX + ".dyno.cluster.type";
@@ -185,7 +187,6 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 
 	private final String DEFAULT_DYN_PROCESS_NAME = "dynomite";
 	private final int DEFAULT_DYN_MEMCACHED_PORT = 11211;
-	private final int DEFAULT_DYNO_REQ_TIMEOUT_IN_MILLISEC = 5000;
 	private final int DEFAULT_DYNO_GOSSIP_INTERVAL = 10000;
 	private final String DEFAULT_DYNO_TOKENS_HASH = "murmur";
 	private final int DEFAULT_DYNO_CLUSTER_TYPE = JedisConfiguration.DYNO_REDIS; //redis
@@ -601,9 +602,14 @@ public class DynomitemanagerConfiguration implements IConfiguration {
 		return 30000;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * @return {@inheritDoc}
+	 */
 	@Override
-	public int getTimeout() {
-		return configSource.get(CONFIG_DYNO_REQ_TIMEOUT_NAME, DEFAULT_DYNO_REQ_TIMEOUT_IN_MILLISEC);
+	public int getRequestTimeout() {
+		final int DEFAULT_DYNOMITE_REQUEST_TIMEOUT = 5000;
+		return configSource.get(CONFIG_DYNOMITE_REQUEST_TIMEOUT, DEFAULT_DYNOMITE_REQUEST_TIMEOUT);
 	}
 
 	public String getMetadataKeyspace() {
