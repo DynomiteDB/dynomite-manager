@@ -18,50 +18,26 @@ package com.netflix.dynomitemanager.identity;
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.amazonaws.services.dynamodbv2.document.*;
+import com.amazonaws.services.dynamodbv2.document.spec.DeleteItemSpec;
 import com.amazonaws.services.dynamodbv2.document.spec.ScanSpec;
 import com.amazonaws.services.dynamodbv2.document.utils.NameMap;
 import com.amazonaws.services.dynamodbv2.document.utils.ValueMap;
+import com.amazonaws.services.dynamodbv2.model.*;
 import com.google.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-
-//import com.netflix.astyanax.AstyanaxContext;
-//import com.netflix.astyanax.ColumnListMutation;
-//import com.netflix.astyanax.Keyspace;
-//import com.netflix.astyanax.MutationBatch;
-//import com.netflix.astyanax.connectionpool.Host;
-//import com.netflix.astyanax.connectionpool.NodeDiscoveryType;
-//import com.netflix.astyanax.connectionpool.OperationResult;
-//import com.netflix.astyanax.connectionpool.exceptions.ConnectionException;
-//import com.netflix.astyanax.connectionpool.impl.ConnectionPoolConfigurationImpl;
-//import com.netflix.astyanax.connectionpool.impl.ConnectionPoolType;
-//import com.netflix.astyanax.connectionpool.impl.CountingConnectionPoolMonitor;
-//import com.netflix.astyanax.impl.AstyanaxConfigurationImpl;
-//import com.netflix.astyanax.model.ColumnFamily;
-///import com.netflix.astyanax.model.ColumnList;
-//import com.netflix.astyanax.serializers.StringSerializer;
-//import com.netflix.astyanax.thrift.ThriftFamilyFactory;
-///import com.netflix.astyanax.util.TimeUUIDUtils;
-// BALIG: Required imports for Amazon Dynamo
+import java.util.*;
 
 @Singleton
 public class InstanceDataDAODynamo {
 	private static final Logger logger = LoggerFactory.getLogger(InstanceDataDAODynamo.class);
 
-	// BALIG: Dynamo Config Variables
+	// BALIG: Dynamo Config Variables will appear below.
+	// TODO: We still need to find a way on how to connect to the dynamodb online
+	// Below mentioned is just a sample code
 	static DynamoDB dynamoDB = new DynamoDB(new AmazonDynamoDBClient(new ProfileCredentialsProvider()));
 
-	//private final Keyspace bootKeyspace;
-	//private final IConfiguration config;
-	//private final HostSupplier hostSupplier;
-	//private final String BOOT_CLUSTER;
-	//private final String KS_NAME;
-	//private final int thriftPortForAstyanax;
-	//private final AstyanaxContext<Keyspace> ctx;
+	private String CN_KEY = "key";
 	private String CN_ID = "Id";
 	private String CN_APPID = "appId";
 	private String CN_AZ = "availabilityZone";
@@ -74,6 +50,8 @@ public class InstanceDataDAODynamo {
 	private String CN_VOLUME_PREFIX = "ssVolumes";
 	private String CN_UPDATETIME = "updatetime";
 	private String CF_NAME_TOKENS = "tokens";
+	private String CF_NAME_LOCKS = "locks";
+
 	/*
 	 * Schema: create column family tokens with comparator=UTF8Type and
 	 * column_metadata=[ {column_name: appId, validation_class:
@@ -85,81 +63,136 @@ public class InstanceDataDAODynamo {
 	 * UTF8Type}, {column_name: updatetime, validation_class: TimeUUIDType},
 	 * {column_name: location, validation_class: UTF8Type}];
 	 */
-	//public ColumnFamily<String, String> CF_TOKENS = new ColumnFamily<String, String>(CF_NAME_TOKENS,
-	//	StringSerializer.get(), StringSerializer.get());
-	//private String CF_NAME_LOCKS = "locks";
-	// Schema: create column family locks with comparator=UTF8Type;
-	//public ColumnFamily<String, String> CF_LOCKS = new ColumnFamily<String, String>(CF_NAME_LOCKS,
-	//		StringSerializer.get(), StringSerializer.get());
 
-	/*@Inject public InstanceDataDAODynamo(IConfiguration config, HostSupplier hostSupplier)
-			throws ConnectionException {
-		this.config = config;
+	//BALIG: Create tokens table
+	private void createTableTokens(long readCapacityUnits, long writeCapacityUnits) {
 
-		BOOT_CLUSTER = config.getBootClusterName();
+		try {
 
-		if (BOOT_CLUSTER == null || BOOT_CLUSTER.isEmpty())
-			throw new RuntimeException(
-					"BootCluster can not be blank. Please use getBootClusterName() property.");
+			// Define all the attributes of the table
+			ArrayList<AttributeDefinition> attributeDefinitions = new ArrayList<AttributeDefinition>();
+			attributeDefinitions.add(new AttributeDefinition()
+					.withAttributeName(CN_KEY)
+					.withAttributeType("S"));
 
-		KS_NAME = config.getDynamoKeyspaceName();
+			// Define the key schema for the table
+			ArrayList<KeySchemaElement> keySchema = new ArrayList<KeySchemaElement>();
+			keySchema.add(new KeySchemaElement()
+					.withAttributeName(CN_KEY) // Partition key
+					.withKeyType(KeyType.HASH));
 
-		if (KS_NAME == null || KS_NAME.isEmpty())
-			throw new RuntimeException(
-					"Dynamo Keyspace can not be blank. Please use getDynamoKeyspaceName() property.");
+			// Define a request to create a table
+			CreateTableRequest request = new CreateTableRequest()
+					.withTableName(CF_NAME_TOKENS)
+					.withKeySchema(keySchema)
+					.withAttributeDefinitions(attributeDefinitions)
+					.withProvisionedThroughput( new ProvisionedThroughput()
+							.withReadCapacityUnits(readCapacityUnits)
+							.withWriteCapacityUnits(writeCapacityUnits));
 
-		thriftPortForAstyanax = config.getDynamoThriftPortForAstyanax();
-		if (thriftPortForAstyanax <= 0)
-			throw new RuntimeException(
-					"Thrift Port for Astyanax can not be blank. Please use getDynamoThriftPortForAstyanax() property.");
+			// Debugging statement
+			System.out.println("Issuing CreateTable request for " + CF_NAME_TOKENS);
 
-		this.hostSupplier = hostSupplier;
+			// Create the table
+			Table table = dynamoDB.createTable(request);
 
-		if (config.isEurekaHostSupplierEnabled())
-			ctx = initWithThriftDriverWithEurekaHostsSupplier();
-		else
-			ctx = initWithThriftDriverWithExternalHostsSupplier();
+			// Debugging statement
+			System.out.println("Waiting for " + CF_NAME_TOKENS
+					+ " to be created...this may take a while...");
 
-		ctx.start();
-		bootKeyspace = ctx.getClient();
-	}*/
+			// The pointer will return only if the table is created successfully and ready for CRUD operations
+			// i.e. active
+			table.waitForActive();
+		} catch (Exception e) {
+			System.err.println("CreateTable request failed for " + CF_NAME_TOKENS);
+			System.err.println(e.getMessage());
+		}
+	}
+
+	// Function to insert an item in tokens table
+	private void createTokensItems(AppsInstance instance, String key) {
+		try {
+			// Getting the table in which we want to insert items
+			Table table = dynamoDB.getTable(CF_NAME_TOKENS);
+			Map<String, Object> volumes = instance.getVolumes();
+
+			// Create a new item which we want to put into the table
+			Item item = new Item()
+					.withPrimaryKey(CN_KEY, key)
+					.withString(CN_ID, Integer.toString(instance.getId()))
+					.withString(CN_APPID, instance.getApp())
+					.withString(CN_AZ, instance.getZone())
+
+					// TODO: How to get the rack below?
+					//.withString(CN_DC, config.getRack())
+					.withString(CN_INSTANCEID, instance.getInstanceId())
+					.withString(CN_HOSTNAME, instance.getHostName())
+					.withString(CN_EIP, instance.getHostIP())
+					.withString(CN_TOKEN, instance.getToken())
+					.withString(CN_LOCATION, instance.getDatacenter());
+
+					// TODO: How to get the update time below?
+					//.withString(CN_UPDATETIME, TimeUUIDUtils.getUniqueTimeUUIDinMicros());
+
+			if (volumes != null) {
+				for (String path : volumes.keySet()) {
+					item.withString(CN_VOLUME_PREFIX + "_" + path, volumes.get(path).toString());
+				}
+			}
+
+			// Put the item into the tokens table
+			table.putItem(item);
+		} catch (Exception e) {
+			System.err.println("Create items failed.");
+			System.err.println(e.getMessage());
+		}
+	}
 
 	public void createInstanceEntry(AppsInstance instance) throws Exception {
 		logger.info("*** Creating New Instance Entry ***");
 		String key = getRowKey(instance);
+
 		// If the key exists throw exception
 		if (getInstance(instance.getApp(), instance.getRack(), instance.getId()) != null) {
 			logger.info(String.format("Key already exists: %s", key));
 			return;
 		}
-
 		getLock(instance);
 
 		try {
-			/*MutationBatch m = bootKeyspace.prepareMutationBatch();
-			ColumnListMutation<String> clm = m.withRow(CF_TOKENS, key);
-			clm.putColumn(CN_ID, Integer.toString(instance.getId()), null);
-			clm.putColumn(CN_APPID, instance.getApp(), null);
-			clm.putColumn(CN_AZ, instance.getZone(), null);
-			clm.putColumn(CN_DC, config.getRack(), null);
-			clm.putColumn(CN_INSTANCEID, instance.getInstanceId(), null);
-			clm.putColumn(CN_HOSTNAME, instance.getHostName(), null);
-			clm.putColumn(CN_EIP, instance.getHostIP(), null);
-			clm.putColumn(CN_TOKEN, instance.getToken(), null);
-			clm.putColumn(CN_LOCATION, instance.getDatacenter(), null);
-			clm.putColumn(CN_UPDATETIME, TimeUUIDUtils.getUniqueTimeUUIDinMicros(), null);
-			Map<String, Object> volumes = instance.getVolumes();
-			if (volumes != null) {
-				for (String path : volumes.keySet()) {
-					clm.putColumn(CN_VOLUME_PREFIX + "_" + path, volumes.get(path).toString(),
-							null);
-				}
-			}
-			m.execute();*/
+			//  Call the function to create the tokens table
+			createTableTokens(10L, 5L);
+			// Call a function to insert items in tokens table
+			createTokensItems(instance, key);
 		} catch (Exception e) {
 			logger.info(e.getMessage());
 		} finally {
 			releaseLock(instance);
+		}
+	}
+
+	// Function to delete an item from a table based on primary key
+	private void deleteItem(String	tableName,
+				String 	choosingKey) {
+
+		Table table = dynamoDB.getTable(tableName);
+
+		try {
+
+			DeleteItemSpec deleteItemSpec = new DeleteItemSpec()
+					.withPrimaryKey("key", choosingKey)
+					.withReturnValues(ReturnValue.ALL_OLD);
+
+			DeleteItemOutcome outcome = table.deleteItem(deleteItemSpec);
+
+			// Check the response.
+			// TODO: Remove the below debugging statements
+			System.out.println("Printing item that was deleted...");
+			System.out.println(outcome.getItem().toJSONPretty());
+
+		} catch (Exception e) {
+			System.err.println("Error deleting item in " + tableName);
+			System.err.println(e.getMessage());
 		}
 	}
 
@@ -172,6 +205,8 @@ public class InstanceDataDAODynamo {
 	private void getLock(AppsInstance instance) throws Exception {
 
 		String choosingkey = getChoosingKey(instance);
+		// TODO: We need to rewrite the below code
+
 		/*MutationBatch m = bootKeyspace.prepareMutationBatch();
 		ColumnListMutation<String> clm = m.withRow(CF_LOCKS, choosingkey);
 
@@ -209,6 +244,15 @@ public class InstanceDataDAODynamo {
 
 	private void releaseLock(AppsInstance instance) throws Exception {
 		String choosingkey = getChoosingKey(instance);
+		deleteItem(CF_NAME_LOCKS, choosingkey);
+
+		// BALIG: In the below code they are deleting the column
+		//	  instanceId corresponding to the key in row as choosingKey.
+		//	  But in our code above we are deleting the whole row with the key as
+		// 	  choosingKey. I am not sure if this approach is correct.
+		//	  I think we need to update the InstanceId column corresponding
+		//	  choosingkey with null.
+
 		/*MutationBatch m = bootKeyspace.prepareMutationBatch();
 		ColumnListMutation<String> clm = m.withRow(CF_LOCKS, choosingkey);
 
@@ -374,58 +418,4 @@ public class InstanceDataDAODynamo {
 	private String getRowKey(AppsInstance instance) {
 		return instance.getApp() + "_" + instance.getRack() + "_" + instance.getId();
 	}
-
-	/*private AstyanaxContext<Keyspace> initWithThriftDriverWithEurekaHostsSupplier() {
-
-		logger.info("BOOT_CLUSTER = {}, KS_NAME = {}", BOOT_CLUSTER, KS_NAME);
-		return new AstyanaxContext.Builder().forCluster(BOOT_CLUSTER).forKeyspace(KS_NAME)
-				.withAstyanaxConfiguration(new AstyanaxConfigurationImpl()
-						.setDiscoveryType(NodeDiscoveryType.DISCOVERY_SERVICE))
-				.withConnectionPoolConfiguration(new ConnectionPoolConfigurationImpl("MyConnectionPool")
-						.setMaxConnsPerHost(3).setPort(thriftPortForAstyanax))
-				.withHostSupplier(hostSupplier.getSupplier(BOOT_CLUSTER))
-				.withConnectionPoolMonitor(new CountingConnectionPoolMonitor())
-				.buildKeyspace(ThriftFamilyFactory.getInstance());
-
-	}
-
-	private AstyanaxContext<Keyspace> initWithThriftDriverWithExternalHostsSupplier() {
-
-		logger.info("BOOT_CLUSTER = {}, KS_NAME = {}", BOOT_CLUSTER, KS_NAME);
-		return new AstyanaxContext.Builder().forCluster(BOOT_CLUSTER).forKeyspace(KS_NAME)
-				.withAstyanaxConfiguration(new AstyanaxConfigurationImpl()
-						.setDiscoveryType(NodeDiscoveryType.DISCOVERY_SERVICE)
-						.setConnectionPoolType(ConnectionPoolType.ROUND_ROBIN))
-				.withConnectionPoolConfiguration(new ConnectionPoolConfigurationImpl("MyConnectionPool")
-						.setMaxConnsPerHost(3).setPort(thriftPortForAstyanax))
-				.withHostSupplier(getSupplier())
-				.withConnectionPoolMonitor(new CountingConnectionPoolMonitor())
-				.buildKeyspace(ThriftFamilyFactory.getInstance());
-
-	}
-
-	private Supplier<List<Host>> getSupplier() {
-
-		return new Supplier<List<Host>>() {
-
-			@Override public List<Host> get() {
-
-				List<Host> hosts = new ArrayList<Host>();
-
-				List<String> dynHostnames = new ArrayList<String>(Arrays.asList(StringUtils
-						.split(config.getCommaSeparatedDynamoHostNames(), ",")));
-
-				if (dynHostnames.size() == 0)
-					throw new RuntimeException(
-							"Dynamo Host Names can not be blank. At least one host is needed. Please use getCommaSeparatedDynamoHostNames() property.");
-
-				for (String dynHost : dynHostnames) {
-					logger.info("Adding Dynamo Host = {}", dynHost);
-					hosts.add(new Host(dynHost, thriftPortForAstyanax));
-				}
-
-				return hosts;
-			}
-		};
-	}*/
 }
