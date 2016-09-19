@@ -20,16 +20,17 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.amazonaws.services.dynamodbv2.document.*;
 import com.amazonaws.services.dynamodbv2.document.spec.DeleteItemSpec;
 import com.amazonaws.services.dynamodbv2.document.spec.ScanSpec;
+import com.amazonaws.services.dynamodbv2.document.spec.UpdateItemSpec;
 import com.amazonaws.services.dynamodbv2.document.utils.NameMap;
 import com.amazonaws.services.dynamodbv2.document.utils.ValueMap;
 import com.amazonaws.services.dynamodbv2.model.*;
 import com.google.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.util.*;
 
-@Singleton
-public class InstanceDataDAODynamo {
+@Singleton public class InstanceDataDAODynamo {
 	private static final Logger logger = LoggerFactory.getLogger(InstanceDataDAODynamo.class);
 
 	// BALIG: Dynamo Config Variables will appear below.
@@ -64,29 +65,25 @@ public class InstanceDataDAODynamo {
 	 * {column_name: location, validation_class: UTF8Type}];
 	 */
 
-	//BALIG: Create tokens table
+	// Create tokens table
 	private void createTableTokens(long readCapacityUnits, long writeCapacityUnits) {
 
 		try {
 
 			// Define all the attributes of the table
 			ArrayList<AttributeDefinition> attributeDefinitions = new ArrayList<AttributeDefinition>();
-			attributeDefinitions.add(new AttributeDefinition()
-					.withAttributeName(CN_KEY)
+			attributeDefinitions.add(new AttributeDefinition().withAttributeName(CN_KEY)
 					.withAttributeType("S"));
 
 			// Define the key schema for the table
 			ArrayList<KeySchemaElement> keySchema = new ArrayList<KeySchemaElement>();
-			keySchema.add(new KeySchemaElement()
-					.withAttributeName(CN_KEY) // Partition key
+			keySchema.add(new KeySchemaElement().withAttributeName(CN_KEY) // Partition key
 					.withKeyType(KeyType.HASH));
 
 			// Define a request to create a table
-			CreateTableRequest request = new CreateTableRequest()
-					.withTableName(CF_NAME_TOKENS)
-					.withKeySchema(keySchema)
-					.withAttributeDefinitions(attributeDefinitions)
-					.withProvisionedThroughput( new ProvisionedThroughput()
+			CreateTableRequest request = new CreateTableRequest().withTableName(CF_NAME_TOKENS)
+					.withKeySchema(keySchema).withAttributeDefinitions(attributeDefinitions)
+					.withProvisionedThroughput(new ProvisionedThroughput()
 							.withReadCapacityUnits(readCapacityUnits)
 							.withWriteCapacityUnits(writeCapacityUnits));
 
@@ -97,8 +94,8 @@ public class InstanceDataDAODynamo {
 			Table table = dynamoDB.createTable(request);
 
 			// Debugging statement
-			System.out.println("Waiting for " + CF_NAME_TOKENS
-					+ " to be created...this may take a while...");
+			System.out.println(
+					"Waiting for " + CF_NAME_TOKENS + " to be created...this may take a while...");
 
 			// The pointer will return only if the table is created successfully and ready for CRUD operations
 			// i.e. active
@@ -117,12 +114,11 @@ public class InstanceDataDAODynamo {
 			Map<String, Object> volumes = instance.getVolumes();
 
 			// Create a new item which we want to put into the table
-			Item item = new Item()
-					.withPrimaryKey(CN_KEY, key)
+			Item item = new Item().withPrimaryKey(CN_KEY, key)
 					.withString(CN_ID, Integer.toString(instance.getId()))
-					.withString(CN_APPID, instance.getApp())
-					.withString(CN_AZ, instance.getZone())
+					.withString(CN_APPID, instance.getApp()).withString(CN_AZ, instance.getZone())
 
+					// BALIG:
 					// TODO: How to get the rack below?
 					//.withString(CN_DC, config.getRack())
 					.withString(CN_INSTANCEID, instance.getInstanceId())
@@ -131,8 +127,9 @@ public class InstanceDataDAODynamo {
 					.withString(CN_TOKEN, instance.getToken())
 					.withString(CN_LOCATION, instance.getDatacenter());
 
-					// TODO: How to get the update time below?
-					//.withString(CN_UPDATETIME, TimeUUIDUtils.getUniqueTimeUUIDinMicros());
+			// BALIG:
+			// TODO: How to get the update time below?
+			//.withString(CN_UPDATETIME, TimeUUIDUtils.getUniqueTimeUUIDinMicros());
 
 			if (volumes != null) {
 				for (String path : volumes.keySet()) {
@@ -172,20 +169,19 @@ public class InstanceDataDAODynamo {
 	}
 
 	// Function to delete an item from a table based on primary key
-	private void deleteItem(String	tableName,
-				String 	choosingKey) {
+	private void deleteItem(String tableName, String choosingKey) {
 
 		Table table = dynamoDB.getTable(tableName);
 
 		try {
 
-			DeleteItemSpec deleteItemSpec = new DeleteItemSpec()
-					.withPrimaryKey("key", choosingKey)
+			DeleteItemSpec deleteItemSpec = new DeleteItemSpec().withPrimaryKey("key", choosingKey)
 					.withReturnValues(ReturnValue.ALL_OLD);
 
 			DeleteItemOutcome outcome = table.deleteItem(deleteItemSpec);
 
 			// Check the response.
+			// BALIG:
 			// TODO: Remove the below debugging statements
 			System.out.println("Printing item that was deleted...");
 			System.out.println(outcome.getItem().toJSONPretty());
@@ -203,61 +199,114 @@ public class InstanceDataDAODynamo {
 	 * taken.
 	 */
 	private void getLock(AppsInstance instance) throws Exception {
+		String choosingKey = getChoosingKey(instance);
+		Table table = dynamoDB.getTable(CF_NAME_LOCKS);
 
-		String choosingkey = getChoosingKey(instance);
-		// TODO: We need to rewrite the below code
-
-		/*MutationBatch m = bootKeyspace.prepareMutationBatch();
-		ColumnListMutation<String> clm = m.withRow(CF_LOCKS, choosingkey);
+		// BALIG: I have tried to insert the column in dynamodb as per
+		//	  below code but I am not sure if we have the functionality
+		//	  in dynamoDb where a column expires after mentioned duration
+		//	  automatically as happening in the below Netflix code.
+		//MutationBatch m = bootKeyspace.prepareMutationBatch();
+		//ColumnListMutation<String> clm = m.withRow(CF_LOCKS, choosingkey);
 
 		// Expire in 6 sec
-		clm.putColumn(instance.getInstanceId(), instance.getInstanceId(), new Integer(6));
-		m.execute();
-		int count = bootKeyspace.prepareQuery(CF_LOCKS).getKey(choosingkey).getCount().execute().getResult();
-		if (count > 1) {
-			// Need to delete my entry
-			m.withRow(CF_LOCKS, choosingkey).deleteColumn(instance.getInstanceId());
-			m.execute();
-			throw new Exception(String.format("More than 1 contender for lock %s %d", choosingkey, count));
+		//clm.putColumn(instance.getInstanceId(), instance.getInstanceId(), new Integer(6));
+		//m.execute();
+
+		try {
+			UpdateItemSpec updateItemSpec = new UpdateItemSpec().withPrimaryKey(CN_KEY, choosingKey)
+					.withUpdateExpression("set #iid = :val")
+					.withNameMap(new NameMap().with("#iid", instance.getInstanceId()))
+					.withValueMap(new ValueMap().withString(":val", instance.getInstanceId()))
+					.withReturnValues(ReturnValue.ALL_NEW);
+
+			UpdateItemOutcome outcome = table.updateItem(updateItemSpec);
+
+			// BALIG:
+			// TODO: Remove the below debug statements after testing
+			// Check the response.
+			System.out.println("Printing item after adding new attribute...");
+			System.out.println(outcome.getItem().toJSONPretty());
+
+			TableKeysAndAttributes locksTableKeysAndAttributes = new TableKeysAndAttributes(CF_NAME_LOCKS);
+			// Add a partition key
+			locksTableKeysAndAttributes.addHashOnlyPrimaryKeys(CN_KEY, choosingKey);
+
+			BatchGetItemOutcome getItemsOutcome = dynamoDB.batchGetItem(locksTableKeysAndAttributes);
+
+			int count = getItemsOutcome.getTableItems().size();
+			if (count > 1) {
+				// Need to delete my entry
+				DeleteItemSpec deleteItemSpec = new DeleteItemSpec().withPrimaryKey(CN_KEY, choosingKey)
+						.withConditionExpression("#iid = :val")
+						.withNameMap(new NameMap().with("#iid", CN_INSTANCEID))
+						.withValueMap(new ValueMap()
+								.withString(":val", instance.getInstanceId()))
+						.withReturnValues(ReturnValue.ALL_OLD);
+
+				table.deleteItem(deleteItemSpec);
+				throw new Exception(String.format("More than 1 contender for lock %s %d", choosingKey,
+						count));
+			}
+
+			String lockKey = getLockingKey(instance);
+
+			locksTableKeysAndAttributes = new TableKeysAndAttributes(CF_NAME_LOCKS);
+			// Add a partition key
+			locksTableKeysAndAttributes.addHashOnlyPrimaryKeys(CN_KEY, lockKey);
+			getItemsOutcome = dynamoDB.batchGetItem(locksTableKeysAndAttributes);
+
+			if (getItemsOutcome.getTableItems().size() > 0 && !getItemsOutcome.getTableItems()
+					.containsKey(instance.getInstanceId()))
+				throw new Exception(String.format("Lock already taken %s", lockKey));
+
+			updateItemSpec = new UpdateItemSpec().withPrimaryKey(CN_KEY, choosingKey)
+					.withUpdateExpression("set #iid = :val")
+					.withNameMap(new NameMap().with("#iid", instance.getInstanceId()))
+					.withValueMap(new ValueMap().withString(":val", instance.getInstanceId()))
+					.withReturnValues(ReturnValue.ALL_NEW);
+
+			table.updateItem(updateItemSpec);
+			Thread.sleep(100);
+
+			locksTableKeysAndAttributes = new TableKeysAndAttributes(CF_NAME_LOCKS);
+			// Add a partition key
+			locksTableKeysAndAttributes.addHashOnlyPrimaryKeys(CN_KEY, lockKey);
+			getItemsOutcome = dynamoDB.batchGetItem(locksTableKeysAndAttributes);
+
+			if (getItemsOutcome.getTableItems().size() == 1 && !getItemsOutcome.getTableItems()
+					.containsKey(instance.getInstanceId())) {
+				logger.info("Got lock " + lockKey);
+				return;
+			} else
+				throw new Exception(String.format("Cannot insert lock %s", lockKey));
+
+		} catch (Exception e) {
+			System.err.println("Failed to get the lock in " + CF_NAME_LOCKS);
+			System.err.println(e.getMessage());
 		}
-
-		String lockKey = getLockingKey(instance);
-		OperationResult<ColumnList<String>> result = bootKeyspace.prepareQuery(CF_LOCKS).getKey(lockKey)
-				.execute();
-		if (result.getResult().size() > 0 && !result.getResult().getColumnByIndex(0).getName()
-				.equals(instance.getInstanceId()))
-			throw new Exception(String.format("Lock already taken %s", lockKey));
-
-		clm = m.withRow(CF_LOCKS, lockKey);
-		clm.putColumn(instance.getInstanceId(), instance.getInstanceId(), new Integer(600));
-		m.execute();
-		Thread.sleep(100);
-		result = bootKeyspace.prepareQuery(CF_LOCKS).getKey(lockKey).execute();
-		if (result.getResult().size() == 1 && result.getResult().getColumnByIndex(0).getName()
-				.equals(instance.getInstanceId())) {
-			logger.info("Got lock " + lockKey);
-			return;
-		} else
-			throw new Exception(String.format("Cannot insert lock %s", lockKey));*/
-
 	}
 
 	private void releaseLock(AppsInstance instance) throws Exception {
-		String choosingkey = getChoosingKey(instance);
-		deleteItem(CF_NAME_LOCKS, choosingkey);
+		Table table = dynamoDB.getTable(CF_NAME_LOCKS);
+		String choosingKey = getChoosingKey(instance);
+		try {
+			DeleteItemSpec deleteItemSpec = new DeleteItemSpec().withPrimaryKey(CN_KEY, choosingKey)
+					.withConditionExpression("#iid = :val")
+					.withNameMap(new NameMap().with("#iid", CN_INSTANCEID))
+					.withValueMap(new ValueMap().withString(":val", instance.getInstanceId()))
+					.withReturnValues(ReturnValue.ALL_OLD);
 
-		// BALIG: In the below code they are deleting the column
-		//	  instanceId corresponding to the key in row as choosingKey.
-		//	  But in our code above we are deleting the whole row with the key as
-		// 	  choosingKey. I am not sure if this approach is correct.
-		//	  I think we need to update the InstanceId column corresponding
-		//	  choosingkey with null.
+			DeleteItemOutcome outcome = table.deleteItem(deleteItemSpec);
 
-		/*MutationBatch m = bootKeyspace.prepareMutationBatch();
-		ColumnListMutation<String> clm = m.withRow(CF_LOCKS, choosingkey);
-
-		m.withRow(CF_LOCKS, choosingkey).deleteColumn(instance.getInstanceId());
-		m.execute();*/
+			// BALIG:
+			// TODO: We need to remove the below debug statements after testing
+			// Check the response.
+			System.out.println("Printing item that was deleted...");
+			System.out.println(outcome.getItem().toJSONPretty());
+		} catch (Exception e) {
+			System.err.println("Error releasing lock in " + CF_NAME_LOCKS);
+		}
 	}
 
 	public void deleteInstanceEntry(AppsInstance instance) throws Exception {
@@ -270,22 +319,16 @@ public class InstanceDataDAODynamo {
 		if (key == null)
 			return;  //don't fail it
 
-		/*MutationBatch m = bootKeyspace.prepareMutationBatch();
-		m.withRow(CF_TOKENS, key).delete();
-		m.execute();
+		deleteItem(CF_NAME_TOKENS, key);
 
 		key = getLockingKey(instance);
 		// Delete key
-		m = bootKeyspace.prepareMutationBatch();
-		m.withRow(CF_LOCKS, key).delete();
-		m.execute();
+		deleteItem(CF_NAME_LOCKS, key);
 
 		// Have to delete choosing key as well to avoid issues with delete
 		// followed by immediate writes
 		key = getChoosingKey(instance);
-		m = bootKeyspace.prepareMutationBatch();
-		m.withRow(CF_LOCKS, key).delete();
-		m.execute();*/
+		deleteItem(CF_NAME_LOCKS, key);
 
 	}
 
@@ -328,6 +371,7 @@ public class InstanceDataDAODynamo {
 				Item item = iter.next();
 				set.add(transform(item));
 
+				// BALIG:
 				// TODO: DELETE THE BELOW DEBUG STATEMENT
 				System.out.println(item.toString());
 			}
@@ -360,6 +404,7 @@ public class InstanceDataDAODynamo {
 			while (iter.hasNext()) {
 				Item item = iter.next();
 
+				// BALIG:
 				// TODO: DELETE ALL THE BELOW DEBUG STATEMENTS
 				// Print the different attributes of the item fetched
 				System.out.println("Key: " + item.get("key"));
@@ -402,6 +447,7 @@ public class InstanceDataDAODynamo {
 		ins.setRack(item.get(CN_DC).toString());
 		ins.setToken(item.get(CN_TOKEN).toString());
 
+		// BALIG:
 		// TODO: We need to come up with the code to set the update time as below
 		//ins.setUpdatetime(item.getTimestamp());
 		return ins;
