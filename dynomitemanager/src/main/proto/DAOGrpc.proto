@@ -7,18 +7,18 @@ syntax = "proto3";
 option java_multiple_files = true;
 option java_package = "com.netflix.dynomitemanager.identity";
 option java_outer_classname = "InstanceDataDAOGrpc";
-option objc_class_prefix = "InstanceDataDAO";
+option objc_class_prefix = "DAOGrpc";
 
 package com.netflix.dynomitemanager.identity;
 
 // The InstanceDataDAO service definition.
-service InstanceDataDAOCRUD {
+service DAOGrpc {
   // Create an instance entry
-  rpc CreateInstanceEntry(AppsInstance) returns (CRUDResponse) {}
+  rpc CreateInstanceEntry(AppsInstanceFields) returns (CRUDResponse) {}
 }
 
-// The request message containing the fields for AppsInstance.
-message AppsInstance {
+// The request message containing the fields for AppsInstanceFields.
+message AppsInstanceFields {
   string CN_ID = 1;
   string CN_APPID = 2;
   string CN_AZ = 3;
