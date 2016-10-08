@@ -7,12 +7,12 @@ syntax = "proto3";
 option java_multiple_files = true;
 option java_package = "com.netflix.dynomitemanager.identity";
 option java_outer_classname = "InstanceDataDAOGrpc";
-option objc_class_prefix = "DAOGrpc";
+option objc_class_prefix = "DAO";
 
 package com.netflix.dynomitemanager.identity;
 
-// The InstanceDataDAO service definition.
-service DAOGrpc {
+// The DAO service definition.
+service DAO {
   // Create an instance entry
   rpc CreateInstanceEntry(AppsInstanceFields) returns (CRUDResponse) {}
 }
