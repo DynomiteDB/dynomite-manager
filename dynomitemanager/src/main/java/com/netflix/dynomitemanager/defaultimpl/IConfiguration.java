@@ -39,9 +39,10 @@ public interface IConfiguration {
     /**
      * Get the cluster name that is saved in tokens.appId in Cassandra. Cluster name is used to group Dynomite nodes
      * that are part of the same cluster.
+     *
      * @return the cluster name
      */
-    public String getAppName();
+    public String getDynomiteClusterName();
 
     /**
      * @return Zone (or zone for AWS)

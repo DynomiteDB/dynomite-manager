@@ -4,10 +4,14 @@ build/
 *.iml
 *.ipr
 *.iws
-.idea/
 /bin/
 
+# IDE
+.idea/
 
 *.classpath
 *.project
 */.settings/*
+
+# Temp files / backups
+*.bkp

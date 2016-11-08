@@ -286,7 +286,7 @@ public class SimpleTestConfiguration implements IConfiguration {
 	}
 
 	@Override
-	public String getAppName() {
+	public String getDynomiteClusterName() {
 		return "DynomiteManagerTestApp";
 	}
 
