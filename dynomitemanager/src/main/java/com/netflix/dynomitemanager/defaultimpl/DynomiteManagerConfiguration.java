@@ -61,24 +61,28 @@ public class DynomiteManagerConfiguration implements IConfiguration {
     public static final String CASSANDRA_PREFIX = "cassandra";
     public static final String DYNOMITE_PREFIX = "dynomite";
     public static final String EUREKA_PREFIX = "eureka";
-    public static final String REDIS_PREFIX = "redis";
-    public static final String ARDB_PREFIX = "ardb";
-    public static final String ROCKSDB_PREFIX = "rocksdb";
-    public static final String DATASTORE_PREFIX = "datastore"; // Storage engine (aka backend)
+    // Cloud
     public static final String AWS_PREFIX = "aws";
     public static final String AZURE_PREFIX = "azure";
     public static final String GCP_PREFIX = "gcp";
+    // Data store
+    public static final String ARDB_PREFIX = "ardb";
+    public static final String DATASTORE_PREFIX = "datastore"; // Storage engine (aka backend)
+    public static final String REDIS_PREFIX = "redis";
+    public static final String ROCKSDB_PREFIX = "rocksdb";
 
-    public static final String DYNOMITE_PROPS = DYNOMITEMANAGER_PRE + "." + DYNOMITE_PREFIX;
-    public static final String DATASTORE_PROPS = DYNOMITEMANAGER_PRE + "." + DATASTORE_PREFIX;
-    public static final String EUREKA_PROPS = DYNOMITEMANAGER_PRE + "." + EUREKA_PREFIX;
-    public static final String REDIS_PROPS = DYNOMITEMANAGER_PRE + "." + REDIS_PREFIX;
-    public static final String ARDB_PROPS = DYNOMITEMANAGER_PRE + "." + ARDB_PREFIX;
-    public static final String ARDB_ROCKSDB_PROPS = ARDB_PROPS + "." + ROCKSDB_PREFIX;
     public static final String CASSANDRA_PROPS = DYNOMITEMANAGER_PRE + "." + CASSANDRA_PREFIX;
+    public static final String DYNOMITE_PROPS = DYNOMITEMANAGER_PRE + "." + DYNOMITE_PREFIX;
+    public static final String EUREKA_PROPS = DYNOMITEMANAGER_PRE + "." + EUREKA_PREFIX;
+    // Cloud
     public static final String AWS_PROPS = DYNOMITEMANAGER_PRE + "." + AWS_PREFIX;
     public static final String AZURE_PROPS = DYNOMITEMANAGER_PRE + "." + AZURE_PREFIX;
     public static final String GCP_PROPS = DYNOMITEMANAGER_PRE + "." + GCP_PREFIX;
+    // Data store
+    public static final String ARDB_PROPS = DYNOMITEMANAGER_PRE + "." + ARDB_PREFIX;
+    public static final String ARDB_ROCKSDB_PROPS = ARDB_PROPS + "." + ROCKSDB_PREFIX;
+    public static final String DATASTORE_PROPS = DYNOMITEMANAGER_PRE + "." + DATASTORE_PREFIX;
+    public static final String REDIS_PROPS = DYNOMITEMANAGER_PRE + "." + REDIS_PREFIX;
 
     // Archaius
     // ========
@@ -173,6 +177,21 @@ public class DynomiteManagerConfiguration implements IConfiguration {
     private static final String CONFIG_CASSANDRA_SEEDS = CASSANDRA_PROPS + ".seeds";
     private static final String CONFIG_CASSANDRA_THRIFT_PORT = CASSANDRA_PROPS + ".thrift.port";
 
+    // Cloud: AWS
+    // ==========
+
+    // Amazon specific
+    private static final String CONFIG_ASG_NAME = DYNOMITEMANAGER_PRE + ".az.asgname";
+    private static final String CONFIG_REGION_NAME = DYNOMITEMANAGER_PRE + ".az.region";
+    private static final String CONFIG_ACL_GROUP_NAME = DYNOMITEMANAGER_PRE + ".acl.groupname";
+    private static final String CONFIG_VPC = DYNOMITEMANAGER_PRE + ".vpc";
+
+    // Dual Account
+    private static final String CONFIG_EC2_ROLE_ASSUMPTION_ARN = DYNOMITEMANAGER_PRE + ".ec2.roleassumption.arn";
+    private static final String CONFIG_VPC_ROLE_ASSUMPTION_ARN = DYNOMITEMANAGER_PRE + ".vpc.roleassumption.arn";
+    private static final String CONFIG_DUAL_ACCOUNT = DYNOMITEMANAGER_PRE + ".roleassumption.dualaccount";
+    private static final String CONFIG_DUAL_ACCOUNT_AZ = DYNOMITEMANAGER_PRE + ".roleassumption.az";
+
     // Data store (aka backend)
     // ========================
 
@@ -206,18 +225,6 @@ public class DynomiteManagerConfiguration implements IConfiguration {
     // ======
 
     private static final String CONFIG_EUREKA_HOSTS_SUPPLIER_ENABLED = EUREKA_PROPS + ".hosts.supplier.enabled";
-
-    // Amazon specific
-    private static final String CONFIG_ASG_NAME = DYNOMITEMANAGER_PRE + ".az.asgname";
-    private static final String CONFIG_REGION_NAME = DYNOMITEMANAGER_PRE + ".az.region";
-    private static final String CONFIG_ACL_GROUP_NAME = DYNOMITEMANAGER_PRE + ".acl.groupname";
-    private static final String CONFIG_VPC = DYNOMITEMANAGER_PRE + ".vpc";
-
-    // Dual Account
-    private static final String CONFIG_EC2_ROLE_ASSUMPTION_ARN = DYNOMITEMANAGER_PRE + ".ec2.roleassumption.arn";
-    private static final String CONFIG_VPC_ROLE_ASSUMPTION_ARN = DYNOMITEMANAGER_PRE + ".vpc.roleassumption.arn";
-    private static final String CONFIG_DUAL_ACCOUNT = DYNOMITEMANAGER_PRE + ".roleassumption.dualaccount";
-    private static final String CONFIG_DUAL_ACCOUNT_AZ = DYNOMITEMANAGER_PRE + ".roleassumption.az";
 
     // warm up
     private static final String CONFIG_DYNO_WARM_FORCE = DYNOMITEMANAGER_PRE + ".dyno.warm.force";
@@ -515,6 +522,10 @@ public class DynomiteManagerConfiguration implements IConfiguration {
 	return configSource.getList(CONFIG_AVAILABILITY_RACKS, DEFAULT_AVAILABILITY_RACKS);
     }
 
+    // Cloud
+    // =====
+
+    @Override
     public String getDataCenter() {
         String dcEnv = System.getenv("EC2_REGION");
         String dcMetadata = retriever.getDataCenter();
